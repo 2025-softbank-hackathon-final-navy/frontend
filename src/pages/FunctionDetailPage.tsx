@@ -21,7 +21,7 @@ import {
 type Tab = 'overview' | 'traffic'
 
 export function FunctionDetailPage() {
-  const { id } = useParams()
+  const { id: _id } = useParams()
   const navigate = useNavigate()
   const [activeTab, setActiveTab] = useState<Tab>('overview')
 
