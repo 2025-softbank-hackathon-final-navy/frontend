@@ -1,0 +1,44 @@
+name: CI - Pre Build Test
+
+on:
+  pull_request:
+    branches: [ main, develop ]  # PR이 main, develop 브랜치에 올라왔을 때 실행
+
+jobs:
+  build-check:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. 리포지토리 코드 체크아웃
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      # 2. pnpm 설치
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+
+      # 3. Node 버전 셋업
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'  # pnpm 의존성 캐싱 (node_modules 캐시 최적화)
+
+      # 4. TurboRepo 캐시 서버 실행 (GitHub Artifacts 사용)
+      - name: TurboRepo local server
+        uses: felixmosh/turborepo-gh-artifacts@v3
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          server-token: ${{ secrets.GITHUB_TOKEN }}
+
+      # 5. 의존성 설치
+      - name: Install dependencies
+        run: pnpm install
+
+      # 6. 빌드 
+      - name: Build
+        run: pnpm turbo run build
+        env:
+          TURBO_API: 'http://127.0.0.1:9080'  # GitHub Artifacts 기반 TurboRepo 캐시 사용
+          TURBO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TURBO_TEAM: 'my-team'
