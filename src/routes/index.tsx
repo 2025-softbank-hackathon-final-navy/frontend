@@ -2,7 +2,7 @@ import { createBrowserRouter } from 'react-router-dom'
 import { RootLayout } from '../layouts/RootLayout'
 import { 
   HomePage,
-  PrepStationPage,
+  FunctionCreatePage,
   SimulatorPage,
   ArchitecturePage,
   AISousChefPage,
@@ -21,24 +21,12 @@ export const router = createBrowserRouter([
         element: <HomePage />,
       },
       {
-        path: 'prep-station',
-        element: <PrepStationPage />,
-      },
-      {
-        path: 'simulator',
-        element: <SimulatorPage />,
-      },
-      {
-        path: 'architecture',
-        element: <ArchitecturePage />,
-      },
-      {
-        path: 'ai-chef',
-        element: <AISousChefPage />,
-      },
-      {
         path: 'functions',
         element: <FunctionsListPage />,
+      },
+      {
+        path: 'functions/new',
+        element: <FunctionCreatePage />,
       },
       {
         path: 'functions/:id',
@@ -47,6 +35,19 @@ export const router = createBrowserRouter([
       {
         path: 'nodes',
         element: <NodeStatusPage />,
+      },
+      {
+        path: 'ai-helper',
+        element: <AISousChefPage />,
+      },
+      {
+        path: 'architecture',
+        element: <ArchitecturePage />,
+      },
+      // Legacy routes 혹시 몰라서 남김
+      {
+        path: 'simulator',
+        element: <SimulatorPage />,
       },
     ],
   },

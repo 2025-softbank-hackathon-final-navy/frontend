@@ -2,13 +2,11 @@ import { useState } from 'react'
 import { NavLink } from 'react-router-dom'
 
 const navItems = [
-  { path: '/', label: 'Concept', icon: 'fa-home' },
-  { path: '/prep-station', label: 'Prep Station', icon: 'fa-code' },
-  { path: '/simulator', label: 'Kitchen', icon: 'fa-kitchen-set' },
+  { path: '/', label: 'Home', icon: 'fa-home' },
   { path: '/functions', label: 'Functions', icon: 'fa-layer-group' },
   { path: '/nodes', label: 'Nodes', icon: 'fa-server' },
+  { path: '/ai-helper', label: 'AI Helper', icon: 'fa-robot' },
   { path: '/architecture', label: 'Architecture', icon: 'fa-sitemap' },
-  { path: '/ai-chef', label: 'AI Chef', icon: 'fa-robot' },
 ]
 
 export function Navigation() {
@@ -32,6 +30,7 @@ export function Navigation() {
               <NavLink
                 key={item.path}
                 to={item.path}
+                end={item.path === '/'}
                 className={({ isActive }) =>
                   `hover:text-amber-600 transition-colors flex items-center gap-1.5 ${isActive ? 'text-amber-600 font-semibold' : ''}`
                 }
@@ -61,6 +60,7 @@ export function Navigation() {
               <NavLink
                 key={item.path}
                 to={item.path}
+                end={item.path === '/'}
                 onClick={closeMenu}
                 className={({ isActive }) =>
                   `flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
