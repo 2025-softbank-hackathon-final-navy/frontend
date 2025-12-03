@@ -142,6 +142,7 @@ export function PrepStation({ onDeploy, isDeployed }: PrepStationProps) {
   const [runtime, setRuntime] = useState<Runtime>('node')
   const [code, setCode] = useState(DEFAULT_CODE.node)
   const [functionName, setFunctionName] = useState('serverless-pasta')
+  const [functionDescription, setFunctionDescription] = useState('')
   const [isDeploying, setIsDeploying] = useState(false)
   const [isRunning, setIsRunning] = useState(false)
   const [showStatus, setShowStatus] = useState(false)
@@ -260,6 +261,7 @@ export function PrepStation({ onDeploy, isDeployed }: PrepStationProps) {
         '',
         '─── Deployment Info ───',
         `Function: ${functionName}`,
+        ...(functionDescription ? [`Description: ${functionDescription}`] : []),
         `URL: https://codebistro.io/fn/${functionName}`,
         `Version: v${Date.now().toString().slice(-6)}`,
         '',
@@ -373,7 +375,7 @@ export function PrepStation({ onDeploy, isDeployed }: PrepStationProps) {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Code Editor UI */}
-          <div className="bg-[#1e1e1e] rounded-xl shadow-2xl overflow-hidden border border-stone-800 flex flex-col h-[450px]">
+          <div className="bg-[#1e1e1e] rounded-xl shadow-2xl overflow-hidden border border-stone-800 flex flex-col h-[548px]">
             {/* Editor Header */}
             <EditorHeader onClose={() => {}} />
             {/* Monaco Editor */}
@@ -403,7 +405,7 @@ export function PrepStation({ onDeploy, isDeployed }: PrepStationProps) {
           </div>
 
           {/* Deploy Control */}
-          <div className="bg-white rounded-xl border border-stone-200 shadow-sm h-[450px] flex flex-col overflow-hidden">
+          <div className="bg-white rounded-xl border border-stone-200 shadow-sm h-[548px] flex flex-col overflow-hidden">
             {/* Header */}
             <div className="px-5 py-4 border-b border-stone-100">
               <h3 className="font-bold text-lg">Recipe Settings</h3>
@@ -418,6 +420,17 @@ export function PrepStation({ onDeploy, isDeployed }: PrepStationProps) {
                   value={functionName}
                   onChange={(e) => setFunctionName(e.target.value)}
                   className="w-full bg-stone-50 border border-stone-200 rounded px-3 py-2 text-sm text-stone-700 focus:outline-none focus:border-amber-500 transition-colors"
+                  placeholder="my-function-name"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-stone-500 uppercase mb-1">Description</label>
+                <textarea 
+                  value={functionDescription}
+                  onChange={(e) => setFunctionDescription(e.target.value)}
+                  className="w-full bg-stone-50 border border-stone-200 rounded px-3 py-2 text-sm text-stone-700 focus:outline-none focus:border-amber-500 transition-colors resize-none"
+                  rows={2}
+                  placeholder="함수에 대한 간단한 설명을 입력하세요..."
                 />
               </div>
               <div>
