@@ -1,0 +1,187 @@
+{
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "search": "Search",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "confirm": "Confirm",
+    "next": "Next",
+    "prev": "Previous",
+    "close": "Close"
+  },
+  
+  "nav": {
+    "home": "Home",
+    "functions": "Functions",
+    "architecture": "Architecture",
+    "simulator": "Simulator",
+    "aiSousChef": "AI Sous Chef"
+  },
+  
+  "functions": {
+    "title": "Functions",
+    "subtitle": "{{count}} functions registered",
+    "newFunction": "New Function",
+    "search": "Search functions...",
+    "allStatus": "All Status",
+    "allRuntime": "All Runtime",
+    "showing": "Showing {{count}} functions",
+    
+    "table": {
+      "name": "Name",
+      "runtime": "Runtime",
+      "timeout": "Timeout",
+      "lastDeployed": "Last Deployed",
+      "status": "Status",
+      "invocations": "Invocations",
+      "errorRate": "Error Rate"
+    },
+    
+    "status": {
+      "hot": "HOT",
+      "stable": "STABLE",
+      "cold": "COLD"
+    }
+  },
+  
+  "functionCreate": {
+    "title": "Create New Function",
+    "subtitle": "Create and deploy a serverless function",
+    
+    "steps": {
+      "code": "Runtime & Code",
+      "resources": "Resources",
+      "packages": "Packages",
+      "env": "Env & Secrets",
+      "review": "Review & Deploy"
+    },
+    
+    "code": {
+      "title": "Runtime & Code",
+      "subtitle": "Select a runtime and write your function code.",
+      "selectRuntime": "Select Runtime",
+      "functionName": "Function Name",
+      "functionNamePlaceholder": "my-awesome-function",
+      "description": "Description (optional)",
+      "descriptionPlaceholder": "Enter a description for your function",
+      "codeEditor": "Code Editor",
+      "testRun": "Test Run",
+      "expand": "Expand",
+      "collapse": "Collapse"
+    },
+    
+    "resources": {
+      "title": "Resource Settings",
+      "subtitle": "Configure resources for function execution.",
+      "memory": "Memory",
+      "memoryDesc": "Memory allocation for function execution",
+      "timeout": "Timeout",
+      "timeoutDesc": "Maximum function execution time"
+    },
+    
+    "packages": {
+      "title": "Packages & Dependencies",
+      "subtitle": "Configure external packages for your function. They will be installed automatically on deployment.",
+      "packageFile": "Package File",
+      "addedPackages": "Added Packages",
+      "packageList": "Package List",
+      "onePerLine": "One package per line",
+      "popularPackages": "Popular Packages",
+      "installGuide": "Package Installation Guide",
+      "guideItems": {
+        "autoInstall": "Packages are automatically installed on deployment",
+        "coldStart": "Add only necessary packages to reduce Cold Start time",
+        "version": "Specifying versions improves reproducibility"
+      }
+    },
+    
+    "env": {
+      "title": "Environment Variables & Secrets",
+      "subtitle": "Configure environment variables and sensitive information for your function.",
+      "addVariable": "Add Variable",
+      "keyPlaceholder": "KEY_NAME",
+      "valuePlaceholder": "value",
+      "secret": "Secret",
+      "secretDesc": "Sensitive information marked as Secret will be masked in the UI",
+      "noVariables": "No environment variables"
+    },
+    
+    "review": {
+      "title": "Review & Deploy",
+      "subtitle": "Review your settings and deploy the function.",
+      "basicInfo": "Basic Info",
+      "resourceSettings": "Resource Settings",
+      "packages": "Packages",
+      "envVariables": "Environment Variables",
+      "invokeUrl": "Invoke URL",
+      "invokeUrlDesc": "You can invoke the function at this URL after deployment",
+      "deploy": "Deploy",
+      "deploying": "Deploying...",
+      "complete": "Complete"
+    }
+  },
+  
+  "time": {
+    "seconds": "{{count}}s",
+    "minutes": "{{count}}m",
+    "hours": "{{count}}h"
+  },
+  
+  "functionDetail": {
+    "edit": "Edit",
+    "back": "Back",
+    
+    "stats": {
+      "qps": "QPS (1min)",
+      "avgLatency": "Avg Latency",
+      "errorRate": "Error Rate",
+      "p99Latency": "P99 Latency"
+    },
+    
+    "tabs": {
+      "overview": "Overview",
+      "runLogs": "Run & Logs",
+      "triggers": "Triggers",
+      "envSecrets": "Env & Secrets"
+    },
+    
+    "runLogs": {
+      "runFunction": "Run Function",
+      "requestBody": "Request Body (JSON)",
+      "runNow": "Run Now",
+      "executionLogs": "Execution Logs",
+      "refresh": "Refresh"
+    },
+    
+    "triggers": {
+      "addTrigger": "Add Trigger",
+      "active": "Active",
+      "disabled": "Disabled",
+      "triggerTypes": "Trigger Types",
+      "httpDesc": "Invoke via REST API endpoint",
+      "cronDesc": "Execute periodically on schedule",
+      "eventDesc": "Connect with external event sources",
+      "everyNHours": "Every {{count}} hours"
+    },
+    
+    "envSecrets": {
+      "environmentVariables": "Environment Variables",
+      "addVariable": "Add Variable",
+      "secrets": "Secrets",
+      "addSecret": "Add Secret",
+      "updated": "Updated",
+      "securityNote": "Security Notice",
+      "securityItems": {
+        "encrypted": "Secrets are stored encrypted and cannot be viewed in the UI",
+        "injected": "Injected as environment variables during function execution",
+        "recommendation": "Always register sensitive information (API keys, DB passwords, etc.) as Secrets"
+      }
+    }
+  }
+}
+
