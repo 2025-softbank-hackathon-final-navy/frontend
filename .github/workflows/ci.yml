@@ -2,7 +2,7 @@ name: CI - Pre Build Test
 
 on:
   pull_request:
-    branches: [ main, develop ]  # PR이 main, develop 브랜치에 올라왔을 때 실행
+    branches: [ main, dev ]  # PR이 main, develop 브랜치에 올라왔을 때 실행
 
 jobs:
   build-check:
