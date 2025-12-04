@@ -1,18 +1,19 @@
 import { useState } from 'react'
 import { NavLink } from 'react-router-dom'
-
-const navItems = [
-  { path: '/', label: 'Concept', icon: 'fa-home' },
-  { path: '/prep-station', label: 'Prep Station', icon: 'fa-code' },
-  { path: '/simulator', label: 'Kitchen', icon: 'fa-kitchen-set' },
-  { path: '/functions', label: 'Functions', icon: 'fa-layer-group' },
-  { path: '/nodes', label: 'Nodes', icon: 'fa-server' },
-  { path: '/architecture', label: 'Architecture', icon: 'fa-sitemap' },
-  { path: '/ai-chef', label: 'AI Chef', icon: 'fa-robot' },
-]
+import { useTranslation } from 'react-i18next'
+import { LanguageSwitcher } from './LanguageSwitcher'
 
 export function Navigation() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const { t } = useTranslation()
+
+  const navItems = [
+    { path: '/', label: t('nav.home'), icon: 'fa-home' },
+    { path: '/functions', label: t('nav.functions'), icon: 'fa-layer-group' },
+    { path: '/nodes', label: 'Nodes', icon: 'fa-server' },
+    { path: '/ai-helper', label: t('nav.aiSousChef'), icon: 'fa-robot' },
+    { path: '/architecture', label: t('nav.architecture'), icon: 'fa-sitemap' },
+  ]
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen)
   const closeMenu = () => setIsMenuOpen(false)
@@ -27,11 +28,12 @@ export function Navigation() {
           </NavLink>
           
           {/* Desktop Navigation */}
-          <div className="hidden lg:flex space-x-6 text-sm font-medium text-stone-600">
+          <div className="hidden lg:flex items-center space-x-6 text-sm font-medium text-stone-600">
             {navItems.map((item) => (
               <NavLink
                 key={item.path}
                 to={item.path}
+                end={item.path === '/'}
                 className={({ isActive }) =>
                   `hover:text-amber-600 transition-colors flex items-center gap-1.5 ${isActive ? 'text-amber-600 font-semibold' : ''}`
                 }
@@ -40,16 +42,24 @@ export function Navigation() {
                 {item.label}
               </NavLink>
             ))}
+            
+            {/* Language Switcher - Desktop */}
+            <div className="border-l border-stone-200 pl-4 ml-2">
+              <LanguageSwitcher />
+            </div>
           </div>
           
-          {/* Hamburger Button */}
-          <button 
-            className="lg:hidden text-stone-600 p-2 hover:bg-stone-100 rounded-lg transition-colors"
-            onClick={toggleMenu}
-            aria-label="Toggle menu"
-          >
-            <i className={`fa-solid ${isMenuOpen ? 'fa-xmark' : 'fa-bars'} text-xl`}></i>
-          </button>
+          {/* Mobile: Language Switcher + Hamburger */}
+          <div className="lg:hidden flex items-center gap-2">
+            <LanguageSwitcher />
+            <button 
+              className="text-stone-600 p-2 hover:bg-stone-100 rounded-lg transition-colors"
+              onClick={toggleMenu}
+              aria-label="Toggle menu"
+            >
+              <i className={`fa-solid ${isMenuOpen ? 'fa-xmark' : 'fa-bars'} text-xl`}></i>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -61,6 +71,7 @@ export function Navigation() {
               <NavLink
                 key={item.path}
                 to={item.path}
+                end={item.path === '/'}
                 onClick={closeMenu}
                 className={({ isActive }) =>
                   `flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${

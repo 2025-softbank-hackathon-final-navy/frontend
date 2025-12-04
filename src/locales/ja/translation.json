@@ -1,0 +1,187 @@
+{
+  "common": {
+    "save": "保存",
+    "cancel": "キャンセル",
+    "delete": "削除",
+    "edit": "編集",
+    "create": "作成",
+    "search": "検索",
+    "loading": "読み込み中...",
+    "error": "エラー",
+    "success": "成功",
+    "confirm": "確認",
+    "next": "次へ",
+    "prev": "前へ",
+    "close": "閉じる"
+  },
+  
+  "nav": {
+    "home": "ホーム",
+    "functions": "Functions",
+    "architecture": "アーキテクチャ",
+    "simulator": "シミュレーター",
+    "aiSousChef": "AI Sous Chef"
+  },
+  
+  "functions": {
+    "title": "Functions",
+    "subtitle": "{{count}}個の関数が登録されています",
+    "newFunction": "New Function",
+    "search": "関数を検索...",
+    "allStatus": "すべてのステータス",
+    "allRuntime": "すべてのRuntime",
+    "showing": "{{count}}個の関数を表示中",
+    
+    "table": {
+      "name": "名前",
+      "runtime": "Runtime",
+      "timeout": "タイムアウト",
+      "lastDeployed": "最終デプロイ",
+      "status": "ステータス",
+      "invocations": "呼び出し回数",
+      "errorRate": "エラー率"
+    },
+    
+    "status": {
+      "hot": "HOT",
+      "stable": "STABLE",
+      "cold": "COLD"
+    }
+  },
+  
+  "functionCreate": {
+    "title": "新しい関数を作成",
+    "subtitle": "サーバーレス関数を作成してデプロイします",
+    
+    "steps": {
+      "code": "Runtime & Code",
+      "resources": "リソース",
+      "packages": "パッケージ",
+      "env": "環境変数 & Secrets",
+      "review": "確認 & デプロイ"
+    },
+    
+    "code": {
+      "title": "Runtime & コード作成",
+      "subtitle": "Runtimeを選択し、関数コードを作成してください。",
+      "selectRuntime": "Runtimeを選択",
+      "functionName": "関数名",
+      "functionNamePlaceholder": "my-awesome-function",
+      "description": "説明（任意）",
+      "descriptionPlaceholder": "関数の説明を入力してください",
+      "codeEditor": "コードエディター",
+      "testRun": "テスト実行",
+      "expand": "拡大",
+      "collapse": "縮小"
+    },
+    
+    "resources": {
+      "title": "リソース設定",
+      "subtitle": "関数の実行に必要なリソースを設定してください。",
+      "memory": "メモリ",
+      "memoryDesc": "関数実行に割り当てるメモリサイズ",
+      "timeout": "タイムアウト",
+      "timeoutDesc": "関数の最大実行時間"
+    },
+    
+    "packages": {
+      "title": "パッケージ & 依存関係",
+      "subtitle": "関数で使用する外部パッケージを設定してください。デプロイ時に自動的にインストールされます。",
+      "packageFile": "パッケージファイル",
+      "addedPackages": "追加されたパッケージ",
+      "packageList": "パッケージリスト",
+      "onePerLine": "1行に1つずつ入力",
+      "popularPackages": "人気パッケージ",
+      "installGuide": "パッケージインストールガイド",
+      "guideItems": {
+        "autoInstall": "デプロイ時に自動的にパッケージがインストールされます",
+        "coldStart": "Cold Start時間を短縮するため、必要なパッケージのみ追加してください",
+        "version": "バージョンを指定すると再現性が向上します"
+      }
+    },
+    
+    "env": {
+      "title": "環境変数 & Secrets",
+      "subtitle": "関数で使用する環境変数と機密情報を設定してください。",
+      "addVariable": "変数を追加",
+      "keyPlaceholder": "KEY_NAME",
+      "valuePlaceholder": "value",
+      "secret": "Secret",
+      "secretDesc": "機密情報はSecretとしてマークするとUIでマスクされます",
+      "noVariables": "環境変数なし"
+    },
+    
+    "review": {
+      "title": "デプロイ確認",
+      "subtitle": "設定を確認し、関数をデプロイしてください。",
+      "basicInfo": "基本情報",
+      "resourceSettings": "リソース設定",
+      "packages": "パッケージ",
+      "envVariables": "環境変数",
+      "invokeUrl": "Invoke URL",
+      "invokeUrlDesc": "デプロイ後、このURLで関数を呼び出すことができます",
+      "deploy": "デプロイ",
+      "deploying": "デプロイ中...",
+      "complete": "完了"
+    }
+  },
+  
+  "time": {
+    "seconds": "{{count}}秒",
+    "minutes": "{{count}}分",
+    "hours": "{{count}}時間"
+  },
+  
+  "functionDetail": {
+    "edit": "編集",
+    "back": "戻る",
+    
+    "stats": {
+      "qps": "QPS（1分）",
+      "avgLatency": "平均レイテンシー",
+      "errorRate": "エラー率",
+      "p99Latency": "P99レイテンシー"
+    },
+    
+    "tabs": {
+      "overview": "概要",
+      "runLogs": "実行 & ログ",
+      "triggers": "トリガー",
+      "envSecrets": "環境変数 & Secrets"
+    },
+    
+    "runLogs": {
+      "runFunction": "関数を実行",
+      "requestBody": "リクエストボディ（JSON）",
+      "runNow": "今すぐ実行",
+      "executionLogs": "実行ログ",
+      "refresh": "更新"
+    },
+    
+    "triggers": {
+      "addTrigger": "トリガーを追加",
+      "active": "有効",
+      "disabled": "無効",
+      "triggerTypes": "トリガータイプ",
+      "httpDesc": "REST APIエンドポイントで呼び出し",
+      "cronDesc": "スケジュールに従って定期実行",
+      "eventDesc": "外部イベントソースと連携",
+      "everyNHours": "{{count}}時間ごとに実行"
+    },
+    
+    "envSecrets": {
+      "environmentVariables": "環境変数",
+      "addVariable": "変数を追加",
+      "secrets": "Secrets",
+      "addSecret": "Secretを追加",
+      "updated": "更新日",
+      "securityNote": "セキュリティに関する注意事項",
+      "securityItems": {
+        "encrypted": "Secretsは暗号化されて保存され、UIで値を確認することはできません",
+        "injected": "関数実行時に環境変数として注入されます",
+        "recommendation": "機密情報（APIキー、DBパスワードなど）は必ずSecretsとして登録してください"
+      }
+    }
+  }
+}
+
