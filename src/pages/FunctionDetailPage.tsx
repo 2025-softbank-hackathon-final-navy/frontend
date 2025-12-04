@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import {
   RouterDecisionCard,
   WarmStatusBar,
@@ -23,15 +24,16 @@ type Tab = 'overview' | 'run-logs' | 'triggers' | 'env-secrets'
 export function FunctionDetailPage() {
   const { id: _id } = useParams()
   const navigate = useNavigate()
+  const { t } = useTranslation()
   const [activeTab, setActiveTab] = useState<Tab>('overview')
 
   const fn = mockFunctionDetail
 
   const tabs: { id: Tab; label: string; icon: string }[] = [
-    { id: 'overview', label: 'Overview', icon: 'fa-gauge-high' },
-    { id: 'run-logs', label: 'Run & Logs', icon: 'fa-terminal' },
-    { id: 'triggers', label: 'Triggers', icon: 'fa-bolt' },
-    { id: 'env-secrets', label: 'Env & Secrets', icon: 'fa-key' },
+    { id: 'overview', label: t('functionDetail.tabs.overview'), icon: 'fa-gauge-high' },
+    { id: 'run-logs', label: t('functionDetail.tabs.runLogs'), icon: 'fa-terminal' },
+    { id: 'triggers', label: t('functionDetail.tabs.triggers'), icon: 'fa-bolt' },
+    { id: 'env-secrets', label: t('functionDetail.tabs.envSecrets'), icon: 'fa-key' },
   ]
 
   return (
@@ -58,26 +60,26 @@ export function FunctionDetailPage() {
           className="px-4 py-2 text-sm font-medium text-stone-600 bg-stone-100 hover:bg-stone-200 rounded-lg transition-colors"
         >
           <i className="fa-solid fa-pen mr-2"></i>
-          Edit
+          {t('functionDetail.edit')}
         </button>
       </div>
 
       {/* Summary Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div className="bg-white rounded-xl border border-stone-200 p-4">
-          <div className="text-xs text-stone-400 mb-1">QPS (1분)</div>
+          <div className="text-xs text-stone-400 mb-1">{t('functionDetail.stats.qps')}</div>
           <div className="text-2xl font-bold text-stone-800">{fn.recentStats.qps.toFixed(1)}</div>
         </div>
         <div className="bg-white rounded-xl border border-stone-200 p-4">
-          <div className="text-xs text-stone-400 mb-1">Avg Latency</div>
+          <div className="text-xs text-stone-400 mb-1">{t('functionDetail.stats.avgLatency')}</div>
           <div className="text-2xl font-bold text-stone-800">{fn.recentStats.avgLatencyMs}ms</div>
         </div>
         <div className="bg-white rounded-xl border border-stone-200 p-4">
-          <div className="text-xs text-stone-400 mb-1">Error Rate</div>
+          <div className="text-xs text-stone-400 mb-1">{t('functionDetail.stats.errorRate')}</div>
           <div className="text-2xl font-bold text-stone-800">{(fn.recentStats.errorRate * 100).toFixed(1)}%</div>
         </div>
         <div className="bg-white rounded-xl border border-stone-200 p-4">
-          <div className="text-xs text-stone-400 mb-1">P99 Latency</div>
+          <div className="text-xs text-stone-400 mb-1">{t('functionDetail.stats.p99Latency')}</div>
           <div className="text-2xl font-bold text-stone-800">{fn.recentStats.p99LatencyMs}ms</div>
         </div>
       </div>
@@ -141,6 +143,7 @@ function OverviewTab({ fn }: { fn: typeof mockFunctionDetail }) {
 
 // Run & Logs Tab Component
 function RunLogsTab() {
+  const { t } = useTranslation()
   const mockLogs = [
     { id: 1, timestamp: new Date(Date.now() - 5000).toISOString(), level: 'INFO', message: 'Function executed successfully', duration: 245 },
     { id: 2, timestamp: new Date(Date.now() - 15000).toISOString(), level: 'INFO', message: 'Processing request from user-123', duration: 312 },
@@ -164,11 +167,11 @@ function RunLogsTab() {
       <div className="bg-white rounded-xl border border-stone-200 p-6">
         <h3 className="font-semibold text-stone-800 mb-4 flex items-center gap-2">
           <i className="fa-solid fa-play text-green-500"></i>
-          Run Function
+          {t('functionDetail.runLogs.runFunction')}
         </h3>
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-stone-600 mb-2">Request Body (JSON)</label>
+            <label className="block text-sm font-medium text-stone-600 mb-2">{t('functionDetail.runLogs.requestBody')}</label>
             <textarea
               className="w-full h-32 px-4 py-3 border border-stone-200 rounded-lg font-mono text-sm bg-stone-50 focus:outline-none focus:ring-2 focus:ring-amber-500/30 focus:border-amber-500"
               placeholder='{"key": "value"}'
@@ -177,7 +180,7 @@ function RunLogsTab() {
           </div>
           <button className="px-6 py-2.5 bg-gradient-to-r from-amber-500 to-orange-500 text-white font-semibold rounded-lg hover:shadow-lg transition-all">
             <i className="fa-solid fa-play mr-2"></i>
-            Run Now
+            {t('functionDetail.runLogs.runNow')}
           </button>
         </div>
       </div>
@@ -187,18 +190,18 @@ function RunLogsTab() {
         <div className="flex items-center justify-between mb-4">
           <h3 className="font-semibold text-stone-800 flex items-center gap-2">
             <i className="fa-solid fa-scroll text-stone-500"></i>
-            Execution Logs
+            {t('functionDetail.runLogs.executionLogs')}
           </h3>
           <button className="text-sm text-amber-600 hover:text-amber-700 font-medium">
             <i className="fa-solid fa-rotate-right mr-1"></i>
-            Refresh
+            {t('functionDetail.runLogs.refresh')}
           </button>
         </div>
         <div className="space-y-2 max-h-96 overflow-y-auto">
           {mockLogs.map((log) => (
             <div key={log.id} className="flex items-start gap-3 p-3 bg-stone-50 rounded-lg font-mono text-sm">
               <span className="text-xs text-stone-400 whitespace-nowrap">
-                {new Date(log.timestamp).toLocaleTimeString('ko-KR')}
+                {new Date(log.timestamp).toLocaleTimeString()}
               </span>
               <span className={`px-2 py-0.5 rounded text-xs font-semibold ${getLevelColor(log.level)}`}>
                 {log.level}
@@ -215,9 +218,10 @@ function RunLogsTab() {
 
 // Triggers Tab Component
 function TriggersTab() {
+  const { t } = useTranslation()
   const mockTriggers = [
     { id: 1, type: 'HTTP', endpoint: '/api/process-image', method: 'POST', enabled: true },
-    { id: 2, type: 'CRON', schedule: '0 */6 * * *', description: '매 6시간마다 실행', enabled: true },
+    { id: 2, type: 'CRON', schedule: '0 */6 * * *', description: t('functionDetail.triggers.everyNHours', { count: 6 }), enabled: true },
     { id: 3, type: 'EVENT', source: 'S3', event: 's3:ObjectCreated:*', enabled: false },
   ]
 
@@ -227,7 +231,7 @@ function TriggersTab() {
       <div className="flex justify-end">
         <button className="px-4 py-2 bg-amber-500 text-white font-semibold rounded-lg hover:bg-amber-600 transition-colors">
           <i className="fa-solid fa-plus mr-2"></i>
-          Add Trigger
+          {t('functionDetail.triggers.addTrigger')}
         </button>
       </div>
 
@@ -252,7 +256,7 @@ function TriggersTab() {
                     <span className={`px-2 py-0.5 rounded text-xs font-medium ${
                       trigger.enabled ? 'bg-green-100 text-green-700' : 'bg-stone-100 text-stone-500'
                     }`}>
-                      {trigger.enabled ? 'Active' : 'Disabled'}
+                      {trigger.enabled ? t('functionDetail.triggers.active') : t('functionDetail.triggers.disabled')}
                     </span>
                   </div>
                   <div className="text-sm text-stone-500 mt-1">
@@ -285,17 +289,17 @@ function TriggersTab() {
       <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl p-6 border border-blue-100">
         <h4 className="font-semibold text-stone-800 mb-2 flex items-center gap-2">
           <i className="fa-solid fa-lightbulb text-amber-500"></i>
-          트리거 유형
+          {t('functionDetail.triggers.triggerTypes')}
         </h4>
         <div className="grid md:grid-cols-3 gap-4 text-sm text-stone-600">
           <div>
-            <span className="font-medium">HTTP:</span> REST API 엔드포인트로 호출
+            <span className="font-medium">HTTP:</span> {t('functionDetail.triggers.httpDesc')}
           </div>
           <div>
-            <span className="font-medium">CRON:</span> 일정에 따라 주기적 실행
+            <span className="font-medium">CRON:</span> {t('functionDetail.triggers.cronDesc')}
           </div>
           <div>
-            <span className="font-medium">EVENT:</span> 외부 이벤트 소스와 연동
+            <span className="font-medium">EVENT:</span> {t('functionDetail.triggers.eventDesc')}
           </div>
         </div>
       </div>
@@ -305,6 +309,7 @@ function TriggersTab() {
 
 // Env & Secrets Tab Component
 function EnvSecretsTab() {
+  const { t } = useTranslation()
   const mockEnvVars = [
     { key: 'NODE_ENV', value: 'production', isSecret: false },
     { key: 'LOG_LEVEL', value: 'info', isSecret: false },
@@ -324,11 +329,11 @@ function EnvSecretsTab() {
         <div className="flex items-center justify-between mb-4">
           <h3 className="font-semibold text-stone-800 flex items-center gap-2">
             <i className="fa-solid fa-sliders text-stone-500"></i>
-            Environment Variables
+            {t('functionDetail.envSecrets.environmentVariables')}
           </h3>
           <button className="text-sm text-amber-600 hover:text-amber-700 font-medium">
             <i className="fa-solid fa-plus mr-1"></i>
-            Add Variable
+            {t('functionDetail.envSecrets.addVariable')}
           </button>
         </div>
         <div className="space-y-2">
@@ -353,11 +358,11 @@ function EnvSecretsTab() {
         <div className="flex items-center justify-between mb-4">
           <h3 className="font-semibold text-stone-800 flex items-center gap-2">
             <i className="fa-solid fa-key text-amber-500"></i>
-            Secrets
+            {t('functionDetail.envSecrets.secrets')}
           </h3>
           <button className="text-sm text-amber-600 hover:text-amber-700 font-medium">
             <i className="fa-solid fa-plus mr-1"></i>
-            Add Secret
+            {t('functionDetail.envSecrets.addSecret')}
           </button>
         </div>
         <div className="space-y-2">
@@ -367,7 +372,7 @@ function EnvSecretsTab() {
               <code className="font-mono text-sm font-semibold text-stone-700 min-w-[140px]">{secret.key}</code>
               <span className="text-stone-400">=</span>
               <span className="font-mono text-sm text-stone-400 flex-1">••••••••••••</span>
-              <span className="text-xs text-stone-400">Updated: {secret.lastUpdated}</span>
+              <span className="text-xs text-stone-400">{t('functionDetail.envSecrets.updated')}: {secret.lastUpdated}</span>
               <button className="p-1.5 text-stone-400 hover:text-stone-600 hover:bg-amber-100 rounded transition-colors">
                 <i className="fa-solid fa-pen text-xs"></i>
               </button>
@@ -383,12 +388,12 @@ function EnvSecretsTab() {
       <div className="bg-gradient-to-r from-amber-50 to-orange-50 rounded-xl p-6 border border-amber-100">
         <h4 className="font-semibold text-stone-800 mb-2 flex items-center gap-2">
           <i className="fa-solid fa-shield-halved text-amber-500"></i>
-          보안 주의사항
+          {t('functionDetail.envSecrets.securityNote')}
         </h4>
         <ul className="text-sm text-stone-600 space-y-1 list-disc list-inside">
-          <li>Secrets는 암호화되어 저장되며, UI에서 값을 확인할 수 없습니다</li>
-          <li>함수 실행 시 환경변수로 주입됩니다</li>
-          <li>민감한 정보(API 키, DB 비밀번호 등)는 반드시 Secrets로 등록하세요</li>
+          <li>{t('functionDetail.envSecrets.securityItems.encrypted')}</li>
+          <li>{t('functionDetail.envSecrets.securityItems.injected')}</li>
+          <li>{t('functionDetail.envSecrets.securityItems.recommendation')}</li>
         </ul>
       </div>
     </div>
