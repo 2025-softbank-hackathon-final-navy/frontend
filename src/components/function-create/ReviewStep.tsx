@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useFunctionCreateStore, RUNTIME_CONFIG } from '../../stores/functionCreateStore'
-import { useCreateFunction } from '../../apis'
+// import { useCreateFunction } from '../../apis' // TODO: 실제 API 연동 시 활성화
 import { ConsoleOutput } from './ConsoleOutput'
 
 export function ReviewStep() {
@@ -28,7 +28,7 @@ export function ReviewStep() {
     reset,
   } = useFunctionCreateStore()
 
-  const createFunction = useCreateFunction()
+  // const createFunction = useCreateFunction() // TODO: 실제 API 연동 시 활성화
   
   const validEnvVars = envVariables.filter(e => e.key.trim())
   const secretCount = validEnvVars.filter(e => e.isSecret).length

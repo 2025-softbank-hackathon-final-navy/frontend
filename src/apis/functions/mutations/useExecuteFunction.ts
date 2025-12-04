@@ -3,7 +3,6 @@ import apiClient from '../../instance'
 import {
   ExecuteFunctionRequestSchema,
   ExecuteFunctionResponseSchema,
-  type ExecuteFunctionRequest,
   type ExecutionResult,
 } from '../dto'
 import { functionKeys } from '../queries/useFunction'
