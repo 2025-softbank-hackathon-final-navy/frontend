@@ -8,7 +8,6 @@ import {
   AISousChefPage,
   FunctionsListPage,
   FunctionDetailPage,
-  NodeStatusPage,
 } from '../pages'
 
 export const router = createBrowserRouter([
@@ -31,10 +30,6 @@ export const router = createBrowserRouter([
       {
         path: 'functions/:id',
         element: <FunctionDetailPage />,
-      },
-      {
-        path: 'nodes',
-        element: <NodeStatusPage />,
       },
       {
         path: 'ai-helper',

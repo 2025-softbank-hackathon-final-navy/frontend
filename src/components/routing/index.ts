@@ -5,5 +5,4 @@ export { RoutingHistoryTable } from './RoutingHistoryTable'
 export { QpsWarmChart } from './QpsWarmChart'
 export { TrafficHeatmap } from './TrafficHeatmap'
 export { PredictionChart } from './PredictionChart'
-export { NodeStatusBoard } from './NodeStatusBoard'
 
