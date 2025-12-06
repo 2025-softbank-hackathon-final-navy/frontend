@@ -134,7 +134,17 @@
   
   "functionDetail": {
     "edit": "Edit",
+    "delete": "Delete",
     "back": "Back",
+    
+    "deleteModal": {
+      "title": "Delete Function",
+      "message": "Are you sure you want to delete '{{name}}'?",
+      "warning": "This action cannot be undone. All function data and execution history will be permanently deleted.",
+      "confirm": "Delete",
+      "cancel": "Cancel",
+      "deleting": "Deleting..."
+    },
     
     "stats": {
       "qps": "QPS (1min)",

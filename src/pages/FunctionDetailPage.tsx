@@ -18,6 +18,7 @@ import {
   mockPredictionData,
   getPoolColor,
 } from '../data/mockRoutingData'
+import { useDeleteFunction } from '../apis'
 
 type Tab = 'overview' | 'run-logs' | 'triggers' | 'env-secrets'
 
@@ -26,8 +27,22 @@ export function FunctionDetailPage() {
   const navigate = useNavigate()
   const { t } = useTranslation()
   const [activeTab, setActiveTab] = useState<Tab>('overview')
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
+  
+  const deleteFunction = useDeleteFunction()
 
   const fn = mockFunctionDetail
+  
+  const handleDelete = async () => {
+    if (!_id) return
+    
+    try {
+      await deleteFunction.mutateAsync(_id)
+      navigate('/functions')
+    } catch (error) {
+      console.error('Failed to delete function:', error)
+    }
+  }
 
   const tabs: { id: Tab; label: string; icon: string }[] = [
     { id: 'overview', label: t('functionDetail.tabs.overview'), icon: 'fa-gauge-high' },
@@ -55,14 +70,76 @@ export function FunctionDetailPage() {
           </div>
           <p className="text-stone-500 text-sm mt-1">{fn.description}</p>
         </div>
-        <button
-          onClick={() => navigate(`/functions/${_id}/edit`)}
-          className="px-4 py-2 text-sm font-medium text-stone-600 bg-stone-100 hover:bg-stone-200 rounded-lg transition-colors"
-        >
-          <i className="fa-solid fa-pen mr-2"></i>
-          {t('functionDetail.edit')}
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => navigate(`/functions/${_id}/edit`)}
+            className="px-4 py-2 text-sm font-medium text-stone-600 bg-stone-100 hover:bg-stone-200 rounded-lg transition-colors"
+          >
+            <i className="fa-solid fa-pen mr-2"></i>
+            {t('functionDetail.edit')}
+          </button>
+          <button
+            onClick={() => setShowDeleteModal(true)}
+            className="px-4 py-2 text-sm font-medium text-red-600 bg-red-50 hover:bg-red-100 rounded-lg transition-colors"
+          >
+            <i className="fa-solid fa-trash mr-2"></i>
+            {t('functionDetail.delete')}
+          </button>
+        </div>
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl shadow-2xl max-w-md w-full mx-4 overflow-hidden">
+            <div className="p-6">
+              <div className="flex items-center gap-4 mb-4">
+                <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
+                  <i className="fa-solid fa-triangle-exclamation text-red-600 text-xl"></i>
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-stone-900">
+                    {t('functionDetail.deleteModal.title')}
+                  </h3>
+                </div>
+              </div>
+              <p className="text-stone-600 mb-2">
+                {t('functionDetail.deleteModal.message', { name: fn.name })}
+              </p>
+              <p className="text-sm text-stone-500 bg-stone-50 p-3 rounded-lg">
+                <i className="fa-solid fa-info-circle mr-2 text-stone-400"></i>
+                {t('functionDetail.deleteModal.warning')}
+              </p>
+            </div>
+            <div className="flex gap-3 p-4 bg-stone-50 border-t border-stone-200">
+              <button
+                onClick={() => setShowDeleteModal(false)}
+                disabled={deleteFunction.isPending}
+                className="flex-1 px-4 py-2.5 text-sm font-medium text-stone-600 bg-white border border-stone-300 rounded-lg hover:bg-stone-50 transition-colors disabled:opacity-50"
+              >
+                {t('functionDetail.deleteModal.cancel')}
+              </button>
+              <button
+                onClick={handleDelete}
+                disabled={deleteFunction.isPending}
+                className="flex-1 px-4 py-2.5 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+              >
+                {deleteFunction.isPending ? (
+                  <>
+                    <i className="fa-solid fa-spinner fa-spin"></i>
+                    {t('functionDetail.deleteModal.deleting')}
+                  </>
+                ) : (
+                  <>
+                    <i className="fa-solid fa-trash"></i>
+                    {t('functionDetail.deleteModal.confirm')}
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Summary Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
