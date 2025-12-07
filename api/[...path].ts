@@ -6,7 +6,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   // Set CORS headers for ALL requests (including OPTIONS)
   res.setHeader('Access-Control-Allow-Origin', '*')
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Accept')
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Accept, Authorization')
 
   // Handle OPTIONS preflight request
   if (req.method === 'OPTIONS') {
@@ -32,15 +32,32 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   const finalUrl = queryString ? `${targetUrl}?${queryString}` : targetUrl
 
   try {
+    // 원본 요청의 헤더를 그대로 전달 (필요한 헤더만 필터링)
+    const forwardHeaders: Record<string, string> = {}
+    
+    // 원본 요청의 모든 헤더를 전달 (host, connection 등 제외)
+    Object.entries(req.headers).forEach(([key, value]) => {
+      const lowerKey = key.toLowerCase()
+      // Vercel/Vercel 관련 헤더는 제외
+      if (
+        !lowerKey.startsWith('x-vercel-') &&
+        !lowerKey.startsWith('x-forwarded-') &&
+        lowerKey !== 'host' &&
+        lowerKey !== 'connection' &&
+        lowerKey !== 'content-length'
+      ) {
+        if (value) {
+          forwardHeaders[key] = Array.isArray(value) ? value[0] : value
+        }
+      }
+    })
+
     // Forward the request to backend
     const response = await fetch(finalUrl, {
       method: req.method,
-      headers: {
-        'Content-Type': req.headers['content-type'] || 'application/json',
-        'Accept': req.headers['accept'] || 'application/json',
-      },
-      body: req.method !== 'GET' && req.method !== 'HEAD'
-        ? JSON.stringify(req.body)
+      headers: forwardHeaders,
+      body: req.method !== 'GET' && req.method !== 'HEAD' && req.body
+        ? (typeof req.body === 'string' ? req.body : JSON.stringify(req.body))
         : undefined,
     })
 
