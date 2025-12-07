@@ -3,6 +3,16 @@ import type { VercelRequest, VercelResponse } from '@vercel/node'
 const BACKEND_URL = 'https://ec2-43-200-185-236.ap-northeast-2.compute.amazonaws.com:8080'
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
+  // Set CORS headers for ALL requests (including OPTIONS)
+  res.setHeader('Access-Control-Allow-Origin', '*')
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Accept')
+
+  // Handle OPTIONS preflight request
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end()
+  }
+
   // Get the path from the request
   const path = Array.isArray(req.query.path)
     ? req.query.path.join('/')
