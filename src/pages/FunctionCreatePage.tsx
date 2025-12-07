@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useFunctionCreateStore } from '../stores/functionCreateStore'
@@ -14,6 +15,12 @@ export function FunctionCreatePage() {
   const navigate = useNavigate()
   const { t } = useTranslation()
   const { currentStep, setStep, reset } = useFunctionCreateStore()
+  
+  // 페이지 진입 시 초기화 (새로운 함수 생성 시)
+  useEffect(() => {
+    reset()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []) // 마운트 시 한 번만 실행
 
   const handleCancel = () => {
     reset()
@@ -42,24 +49,24 @@ export function FunctionCreatePage() {
     <div className="max-w-4xl mx-auto">
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
-        <div className="flex items-center gap-4">
-          <button
+      <div className="flex items-center gap-4">
+        <button
             onClick={handleCancel}
-            className="p-2 rounded-lg hover:bg-stone-100 transition-colors"
-          >
-            <i className="fa-solid fa-arrow-left text-stone-500"></i>
-          </button>
-          <div>
+          className="p-2 rounded-lg hover:bg-stone-100 transition-colors"
+        >
+          <i className="fa-solid fa-arrow-left text-stone-500"></i>
+        </button>
+        <div>
             <h1 className="text-2xl font-bold text-stone-900 flex items-center gap-2">
               <i className="fa-solid fa-plus-circle text-amber-500"></i>
               {t('functionCreate.title')}
             </h1>
-            <p className="text-stone-500 text-sm mt-1">
+          <p className="text-stone-500 text-sm mt-1">
               {t('functionCreate.subtitle')}
-            </p>
-          </div>
+          </p>
         </div>
-        
+      </div>
+
         <button
           onClick={handleCancel}
           className="text-sm text-stone-500 hover:text-stone-700 transition-colors"

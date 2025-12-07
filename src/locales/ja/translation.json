@@ -30,7 +30,7 @@
     "search": "関数を検索...",
     "allStatus": "すべてのステータス",
     "allRuntime": "すべてのRuntime",
-    "showing": "{{count}}個の関数を表示中",
+    "showing": "{{start}}-{{end}} / 合計 {{total}}個",
     
     "table": {
       "name": "名前",

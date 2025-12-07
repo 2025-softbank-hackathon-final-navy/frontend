@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Serverless Router API 명세서</title>
+    <style>
+        :root {
+            --bg-color: #f4f7f6;
+            --text-color: #333;
+            --primary-color: #0078d4;
+            --method-post: #49cc90; /* Green for POST */
+            --method-get: #61affe;  /* Blue for GET */
+            --method-put: #fca130;  /* Orange for PUT */
+            --method-delete: #f93e3e; /* Red for DELETE */
+            --code-bg: #282c34;
+            --code-text: #abb2bf;
+            --card-bg: #ffffff;
+            --border-color: #e1e4e8;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        h1 { margin: 0; color: #2c3e50; }
+        p.subtitle { color: #7f8c8d; }
+
+        .endpoint-card {
+            background: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            margin-bottom: 30px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        .endpoint-header {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            background-color: #f8f9fa;
+            border-bottom: 1px solid var(--border-color);
+            cursor: pointer;
+        }
+
+        .method {
+            color: white;
+            font-weight: bold;
+            padding: 5px 12px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            margin-right: 15px;
+            min-width: 60px;
+            text-align: center;
+        }
+        
+        .method.post { background-color: var(--method-post); }
+        .method.get { background-color: var(--method-get); }
+        .method.put { background-color: var(--method-put); }
+        .method.delete { background-color: var(--method-delete); }
+
+        .path {
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .summary {
+            margin-left: auto;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .endpoint-body {
+            padding: 20px;
+        }
+
+        h3 {
+            font-size: 1rem;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            color: #555;
+            border-left: 4px solid var(--primary-color);
+            padding-left: 10px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 10px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th { background-color: #f9f9f9; color: #555; font-weight: 600; }
+        td.required { color: #d63031; font-weight: bold; font-size: 0.8rem; }
+        td.optional { color: #636e72; font-size: 0.8rem; }
+
+        pre {
+            background-color: var(--code-bg);
+            color: var(--code-text);
+            padding: 15px;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.9rem;
+            white-space: pre-wrap;
+        }
+
+        .json-key { color: #e06c75; }
+        .json-string { color: #98c379; }
+        .json-number { color: #d19a66; }
+        .json-boolean { color: #56b6c2; }
+        .sse-event { color: #56b6c2; font-weight: bold; }
+        .sse-data { color: #abb2bf; }
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Serverless Router API</h1>
+        <p class="subtitle">함수 등록 및 실행을 위한 API 명세서 v1.1</p>
+    </header>
+
+    <div class="endpoint-card">
+        <div class="endpoint-header">
+            <span class="method post">POST</span>
+            <span class="path">/function</span>
+            <span class="summary">함수 등록 (Register)</span>
+        </div>
+        <div class="endpoint-body">
+            <p>새로운 서버리스 함수를 등록하고, 실행 코드 및 환경 변수를 저장합니다.</p>
+
+            <h3>Request Body (application/json)</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 20%;">Field</th>
+                        <th style="width: 15%;">Type</th>
+                        <th style="width: 10%;">Required</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>function_name</td>
+                        <td>String</td>
+                        <td class="required">Required</td>
+                        <td>함수의 식별 이름</td>
+                    </tr>
+                    <tr>
+                        <td>description</td>
+                        <td>String</td>
+                        <td class="optional">Optional</td>
+                        <td>함수 설명</td>
+                    </tr>
+                    <tr>
+                        <td>runtime</td>
+                        <td>String</td>
+                        <td class="required">Required</td>
+                        <td>실행 환경 (예: python, node)</td>
+                    </tr>
+                    <tr>
+                        <td>timeout</td>
+                        <td>Number</td>
+                        <td class="optional">Optional</td>
+                        <td>실행 제한 시간(초)</td>
+                    </tr>
+                    <tr>
+                        <td>function_code</td>
+                        <td>String</td>
+                        <td class="required">Required</td>
+                        <td>실행할 소스 코드 (전체 문자열)</td>
+                    </tr>
+                    <tr>
+                        <td>env_vars</td>
+                        <td>Map</td>
+                        <td class="optional">Optional</td>
+                        <td>환경 변수 (Key-Value)</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Example Request</h3>
+<pre>{
+  <span class="json-key">"function_name"</span>: <span class="json-string">"my-test-func"</span>,
+  <span class="json-key">"description"</span>: <span class="json-string">"API 테스트용 파이썬 함수"</span>,
+  <span class="json-key">"runtime"</span>: <span class="json-string">"python"</span>,
+  <span class="json-key">"timeout"</span>: <span class="json-number">30</span>,
+  <span class="json-key">"function_code"</span>: <span class="json-string">"def handler(event, context):\n    return {\"status\": 200, \"message\": \"Hello from cURL\"}"</span>,
+  <span class="json-key">"env_vars"</span>: {
+    <span class="json-key">"ENV"</span>: <span class="json-string">"TEST"</span>,
+    <span class="json-key">"VERSION"</span>: <span class="json-string">"1.0"</span>
+  }
+}</pre>
+
+            <h3>Example Response (200 OK)</h3>
+<pre>{
+  <span class="json-key">"function_id"</span>: <span class="json-string">"b56ca2bb-e24d-4346-a16e-64b46325d9b3"</span>
+}</pre>
+        </div>
+    </div>
+
+    <div class="endpoint-card">
+        <div class="endpoint-header">
+            <span class="method put">PUT</span>
+            <span class="path">/function/{function_id}</span>
+            <span class="summary">함수 수정 (Update)</span>
+        </div>
+        <div class="endpoint-body">
+            <p>기존 함수의 코드 및 설정을 업데이트합니다. (ID는 유지됨)</p>
+
+            <h3>Path Parameters</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 20%;">Parameter</th>
+                        <th style="width: 15%;">Type</th>
+                        <th style="width: 10%;">Required</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>function_id</td>
+                        <td>String</td>
+                        <td class="required">Required</td>
+                        <td>수정할 함수의 UUID</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Request Body (application/json)</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 20%;">Field</th>
+                        <th style="width: 15%;">Type</th>
+                        <th style="width: 10%;">Required</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>function_name</td>
+                        <td>String</td>
+                        <td class="required">Required</td>
+                        <td>함수 이름</td>
+                    </tr>
+                    <tr>
+                        <td>description</td>
+                        <td>String</td>
+                        <td class="optional">Optional</td>
+                        <td>함수 설명</td>
+                    </tr>
+                    <tr>
+                        <td>timeout</td>
+                        <td>Number</td>
+                        <td class="optional">Optional</td>
+                        <td>실행 제한 시간(초)</td>
+                    </tr>
+                    <tr>
+                        <td>runtime</td>
+                        <td>String</td>
+                        <td class="required">Required</td>
+                        <td>실행 환경 (node, python 등)</td>
+                    </tr>
+                    <tr>
+                        <td>function_code</td>
+                        <td>String</td>
+                        <td class="required">Required</td>
+                        <td>새로운 소스 코드</td>
+                    </tr>
+                    <tr>
+                        <td>env_vars</td>
+                        <td>Map</td>
+                        <td class="optional">Optional</td>
+                        <td>환경 변수 업데이트</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Example Request</h3>
+<pre>{
+  <span class="json-key">"function_name"</span>: <span class="json-string">"node-data-processor-v2"</span>,
+  <span class="json-key">"description"</span>: <span class="json-string">"노드 데이터 프로세서 (업데이트됨)"</span>,
+  <span class="json-key">"timeout"</span>: <span class="json-number">60</span>,
+  <span class="json-key">"runtime"</span>: <span class="json-string">"node"</span>,
+  <span class="json-key">"function_code"</span>: <span class="json-string">"exports.handler = async (event) => { console.log(\"Updated version\"); return { status: \"ok\" }; };"</span>,
+  <span class="json-key">"env_vars"</span>: {
+    <span class="json-key">"NODE_ENV"</span>: <span class="json-string">"production"</span>,
+    <span class="json-key">"MAX_RETRY"</span>: <span class="json-string">"10"</span>,
+    <span class="json-key">"NEW_FEATURE"</span>: <span class="json-string">"enabled"</span>
+  }
+}</pre>
+
+            <h3>Example Response (200 OK)</h3>
+<pre>{
+  <span class="json-key">"function_id"</span>: <span class="json-string">"96908063-6121-4ce4-88ae-ff17f2a6e5a4"</span>
+}</pre>
+        </div>
+    </div>
+
+    <div class="endpoint-card">
+        <div class="endpoint-header">
+            <span class="method delete">DELETE</span>
+            <span class="path">/function/{function_id}</span>
+            <span class="summary">함수 삭제 (Delete)</span>
+        </div>
+        <div class="endpoint-body">
+            <p>등록된 함수를 영구적으로 삭제합니다. (DB 메타데이터 및 S3 소스 코드 삭제)</p>
+
+            <h3>Path Parameters</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 20%;">Parameter</th>
+                        <th style="width: 15%;">Type</th>
+                        <th style="width: 10%;">Required</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>function_id</td>
+                        <td>String</td>
+                        <td class="required">Required</td>
+                        <td>삭제할 함수의 UUID</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Example Request</h3>
+<pre>curl -X DELETE http://localhost:8080/function/97a4d125-2a8d-439a-8fb5-a8ba5e25db06</pre>
+
+            <h3>Example Response (204 No Content)</h3>
+<pre>
+(No Content)
+</pre>
+        </div>
+    </div>
+
+    <div class="endpoint-card">
+        <div class="endpoint-header">
+            <span class="method post">POST</span>
+            <span class="path">/function/invoke</span>
+            <span class="summary">함수 실행 (Invoke)</span>
+        </div>
+        <div class="endpoint-body">
+            <p>함수 ID를 Body에 포함하여 함수를 실행하고 결과를 동기적으로 반환받습니다.</p>
+
+            <h3>Request Body (application/json)</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 20%;">Field</th>
+                        <th style="width: 15%;">Type</th>
+                        <th style="width: 10%;">Required</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>function_id</td>
+                        <td>String</td>
+                        <td class="required">Required</td>
+                        <td>실행할 함수의 UUID</td>
+                    </tr>
+                    <tr>
+                        <td>args</td>
+                        <td>Map</td>
+                        <td class="optional">Optional</td>
+                        <td>함수에 전달할 인자값</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Example Request</h3>
+<pre>{
+  <span class="json-key">"function_id"</span>: <span class="json-string">"b56ca2bb-e24d-4346-a16e-64b46325d9b3"</span>,
+  <span class="json-key">"args"</span>: {
+    <span class="json-key">"input_value"</span>: <span class="json-number">123</span>,
+    <span class="json-key">"test_mode"</span>: <span class="json-boolean">true</span>
+  }
+}</pre>
+
+            <h3>Example Response (200 OK)</h3>
+<pre>{
+  <span class="json-key">"status"</span>: <span class="json-string">"success"</span>,
+  <span class="json-key">"executionType"</span>: <span class="json-string">"warm"</span>,
+  <span class="json-key">"duration"</span>: <span class="json-number">0.112</span>,
+  <span class="json-key">"logs"</span>: <span class="json-string">"Mock Logs..."</span>,
+  <span class="json-key">"result"</span>: <span class="json-string">"{\"status\": 200, \"message\": \"Hello from cURL\"}"</span>
+}</pre>
+        </div>
+    </div>
+
+    <div class="endpoint-card">
+        <div class="endpoint-header">
+            <span class="method post">POST</span>
+            <span class="path">/function/invoke/stream</span>
+            <span class="summary">함수 스트리밍 실행 (Stream)</span>
+        </div>
+        <div class="endpoint-body">
+            <p>SSE(Server-Sent Events)를 사용하여 함수 실행 로그와 상태를 실시간으로 수신합니다.</p>
+
+            <h3>Required Headers</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 40%;">Header Name</th>
+                        <th style="width: 60%;">Value</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Content-Type</td>
+                        <td>application/json</td>
+                    </tr>
+                    <tr>
+                        <td>Accept</td>
+                        <td>text/event-stream</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Example Request (CURL)</h3>
+<pre>curl -N -X POST http://localhost:8080/function/invoke/stream \
+  -H "Content-Type: application/json" \
+  -H "Accept: text/event-stream" \
+  -d '{
+    "function_id": "b56ca2bb-e24d-4346-a16e-64b46325d9b3",
+    "args": {
+      "stream_mode": true
+    }
+  }'</pre>
+
+            <h3>Example Response (Stream)</h3>
+<pre><span class="sse-event">event:</span>connect
+<span class="sse-data">data:</span>connected!
+
+<span class="sse-event">event:</span>ping
+<span class="sse-data">data:</span>
+
+<span class="sse-event">event:</span>result
+<span class="sse-data">data:</span>{<span class="json-key">"status"</span>:<span class="json-string">"success"</span>,<span class="json-key">"executionType"</span>:<span class="json-string">"warm"</span>,<span class="json-key">"duration"</span>:<span class="json-number">2.534</span>,<span class="json-key">"logs"</span>:<span class="json-string">"..."</span>,<span class="json-key">"result"</span>:<span class="json-string">"..."</span>}</pre>
+        </div>
+    </div>
+
+    <div class="endpoint-card">
+        <div class="endpoint-header">
+            <span class="method get">GET</span>
+            <span class="path">/function/stats</span>
+            <span class="summary">전체 함수 통계 조회</span>
+        </div>
+        <div class="endpoint-body">
+            <p>등록된 모든 함수의 실행 통계(호출 수, 에러율, 상태 등)를 페이징하여 조회합니다.</p>
+
+            <h3>Query Parameters</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Parameter</th>
+                        <th>Type</th>
+                        <th>Description</th>
+                        <th>Default</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>page</td>
+                        <td>Number</td>
+                        <td>페이지 번호 (0부터 시작)</td>
+                        <td>0</td>
+                    </tr>
+                    <tr>
+                        <td>size</td>
+                        <td>Number</td>
+                        <td>페이지 당 항목 수</td>
+                        <td>10</td>
+                    </tr>
+                    <tr>
+                        <td>sort</td>
+                        <td>String</td>
+                        <td>정렬 기준</td>
+                        <td>createdAt,desc</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Example Response (200 OK)</h3>
+<pre>{
+  <span class="json-key">"content"</span>: [
+    {
+      <span class="json-key">"function_id"</span>: <span class="json-string">"b56ca2bb-e24d-4346-a16e-64b46325d9b3"</span>,
+      <span class="json-key">"function_name"</span>: <span class="json-string">"my-test-func"</span>,
+      <span class="json-key">"description"</span>: <span class="json-string">"API 테스트용 파이썬 함수"</span>,
+      <span class="json-key">"runtime"</span>: <span class="json-string">"python"</span>,
+      <span class="json-key">"timeout"</span>: <span class="json-number">30</span>,
+      <span class="json-key">"last_executed"</span>: <span class="json-string">"2025-12-04T07:09:20.922192"</span>,
+      <span class="json-key">"status"</span>: <span class="json-string">"STABLE"</span>,
+      <span class="json-key">"total_requests"</span>: <span class="json-number">15</span>,
+      <span class="json-key">"error_rate"</span>: <span class="json-number">0.0</span>
+    }
+  ],
+  <span class="json-key">"pageable"</span>: { ... },
+  <span class="json-key">"totalPages"</span>: <span class="json-number">1</span>,
+  <span class="json-key">"totalElements"</span>: <span class="json-number">1</span>
+}</pre>
+        </div>
+    </div>
+
+    <div class="endpoint-card">
+        <div class="endpoint-header">
+            <span class="method get">GET</span>
+            <span class="path">/function/{function_id}/stats</span>
+            <span class="summary">단일 함수 통계 조회</span>
+        </div>
+        <div class="endpoint-body">
+            <p>특정 함수의 상세 정보와 실행 통계를 조회합니다.</p>
+
+            <h3>Path Parameters</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 20%;">Parameter</th>
+                        <th style="width: 15%;">Type</th>
+                        <th style="width: 10%;">Required</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>function_id</td>
+                        <td>String</td>
+                        <td class="required">Required</td>
+                        <td>조회할 함수의 UUID</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Example Response (200 OK)</h3>
+<pre>{
+  <span class="json-key">"function_id"</span>: <span class="json-string">"da431ef3-897b-4b2e-a9d3-4a54c689ab75"</span>,
+  <span class="json-key">"function_name"</span>: <span class="json-string">"test"</span>,
+  <span class="json-key">"description"</span>: <span class="json-boolean">null</span>,
+  <span class="json-key">"runtime"</span>: <span class="json-string">"python"</span>,
+  <span class="json-key">"timeout"</span>: <span class="json-number">30</span>,
+  <span class="json-key">"last_executed"</span>: <span class="json-string">"2025-12-06T17:10:27.604993819"</span>,
+  <span class="json-key">"status"</span>: <span class="json-string">"COLD"</span>,
+  <span class="json-key">"total_requests"</span>: <span class="json-number">4</span>,
+  <span class="json-key">"error_rate"</span>: <span class="json-number">0</span>,
+  <span class="json-key">"qps"</span>: <span class="json-number">0</span>,
+  <span class="json-key">"avg_latency"</span>: <span class="json-number">2.44975</span>,
+  <span class="json-key">"history"</span>: [
+    {
+      <span class="json-key">"timestamp"</span>: <span class="json-string">"2024-12-06T23:01:00"</span>,
+      <span class="json-key">"qps"</span>: <span class="json-number">5.2</span>,
+      <span class="json-key">"desired_replicas"</span>: <span class="json-number">1</span>,
+      <span class="json-key">"current_replicas"</span>: <span class="json-number">1</span>
+    },
+    {
+      <span class="json-key">"timestamp"</span>: <span class="json-string">"2024-12-06T23:02:00"</span>,
+      <span class="json-key">"qps"</span>: <span class="json-number">5.5</span>,
+      <span class="json-key">"desired_replicas"</span>: <span class="json-number">1</span>,
+      <span class="json-key">"current_replicas"</span>: <span class="json-number">1</span>
+    },
+    {
+      <span class="json-key">"timestamp"</span>: <span class="json-string">"2024-12-06T23:03:00"</span>,
+      <span class="json-key">"qps"</span>: <span class="json-number">6.1</span>,
+      <span class="json-key">"desired_replicas"</span>: <span class="json-number">1</span>,
+      <span class="json-key">"current_replicas"</span>: <span class="json-number">1</span>
+    }
+  ]
+}</pre>
+        </div>
+    </div>
+
+    <div class="endpoint-card">
+        <div class="endpoint-header">
+            <span class="method get">GET</span>
+            <span class="path">/function/{function_id}/logs</span>
+            <span class="summary">함수 실행 로그 조회</span>
+        </div>
+        <div class="endpoint-body">
+            <p>특정 함수의 실행 이력(로그)을 페이징하여 조회합니다.</p>
+
+            <h3>Path Parameters</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 20%;">Parameter</th>
+                        <th style="width: 15%;">Type</th>
+                        <th style="width: 10%;">Required</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>function_id</td>
+                        <td>String</td>
+                        <td class="required">Required</td>
+                        <td>조회할 함수의 UUID</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Query Parameters</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Parameter</th>
+                        <th>Type</th>
+                        <th>Description</th>
+                        <th>Default</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>page</td>
+                        <td>Number</td>
+                        <td>페이지 번호</td>
+                        <td>0</td>
+                    </tr>
+                    <tr>
+                        <td>size</td>
+                        <td>Number</td>
+                        <td>항목 수</td>
+                        <td>5</td>
+                    </tr>
+                    <tr>
+                        <td>sort</td>
+                        <td>String</td>
+                        <td>정렬 기준</td>
+                        <td>requestAt,desc</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Example Response (200 OK)</h3>
+<pre>{
+  <span class="json-key">"content"</span>: [
+    {
+      <span class="json-key">"request_id"</span>: <span class="json-string">"884696e0-1756-40a8-9ce7-911654ea74b7"</span>,
+      <span class="json-key">"duration"</span>: <span class="json-number">0.14</span>,
+      <span class="json-key">"execution_type"</span>: <span class="json-string">"warm"</span>,
+      <span class="json-key">"request_at"</span>: <span class="json-string">"2025-12-04T07:05:42.257862"</span>,
+      <span class="json-key">"status"</span>: <span class="json-string">"success"</span>
+    }
+  ],
+  <span class="json-key">"pageable"</span>: { ... },
+  <span class="json-key">"totalPages"</span>: <span class="json-number">3</span>,
+  <span class="json-key">"totalElements"</span>: <span class="json-number">15</span>
+}</pre>
+        </div>
+    </div>
+
+    <div class="endpoint-card">
+        <div class="endpoint-header">
+            <span class="method get">GET</span>
+            <span class="path">/function/{function_id}/logs/{request_id}</span>
+            <span class="summary">함수 로그 상세 조회</span>
+        </div>
+        <div class="endpoint-body">
+            <p>특정 실행 요청(Request ID)의 상세 실행 로그(텍스트)를 조회합니다. (S3 저장 데이터)</p>
+
+            <h3>Path Parameters</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 20%;">Parameter</th>
+                        <th style="width: 15%;">Type</th>
+                        <th style="width: 10%;">Required</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>function_id</td>
+                        <td>String</td>
+                        <td class="required">Required</td>
+                        <td>함수의 UUID</td>
+                    </tr>
+                    <tr>
+                        <td>request_id</td>
+                        <td>String</td>
+                        <td class="required">Required</td>
+                        <td>조회할 실행 요청 ID (UUID)</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Example Response (200 OK)</h3>
+            <p style="color: #666; font-size: 0.9rem; margin-top: -10px;">Content-Type: text/plain</p>
+<pre style="white-space: pre-wrap;">
+[INFO] Function execution started
+[INFO] Environment: production
+[DEBUG] Received event: {"key": "value"}
+[INFO] Processing payload...
+[INFO] Calculation result: 42
+[INFO] Execution completed successfully.
+</pre>
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>

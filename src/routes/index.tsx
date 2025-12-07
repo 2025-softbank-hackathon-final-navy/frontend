@@ -3,6 +3,7 @@ import { RootLayout } from '../layouts/RootLayout'
 import { 
   HomePage,
   FunctionCreatePage,
+  FunctionEditPage,
   SimulatorPage,
   ArchitecturePage,
   AISousChefPage,
@@ -30,6 +31,10 @@ export const router = createBrowserRouter([
       {
         path: 'functions/:id',
         element: <FunctionDetailPage />,
+      },
+      {
+        path: 'functions/:id/edit',
+        element: <FunctionEditPage />,
       },
       {
         path: 'ai-helper',

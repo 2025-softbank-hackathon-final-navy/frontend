@@ -5,7 +5,7 @@ import { functionKeys } from '../queries/useFunction'
 /**
  * 함수 삭제 Mutation
  * 
- * DELETE /api/functions/{functionId}
+ * DELETE /function/{function_id}
  * 
  * 등록된 함수를 영구적으로 삭제 (DB 메타데이터 및 S3 소스 코드 삭제)
  * 성공 시 204 No Content 반환
@@ -13,7 +13,7 @@ import { functionKeys } from '../queries/useFunction'
 
 // API 함수
 async function deleteFunction(functionId: string): Promise<void> {
-  await apiClient.delete(`/api/functions/${functionId}`)
+  await apiClient.delete(`/function/${functionId}`)
 }
 
 // React Query Hook

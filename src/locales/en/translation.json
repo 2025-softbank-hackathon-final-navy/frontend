@@ -30,7 +30,7 @@
     "search": "Search functions...",
     "allStatus": "All Status",
     "allRuntime": "All Runtime",
-    "showing": "Showing {{count}} functions",
+    "showing": "{{start}}-{{end}} / Total {{total}}",
     
     "table": {
       "name": "Name",
@@ -123,6 +123,20 @@
       "deploy": "Deploy",
       "deploying": "Deploying...",
       "complete": "Complete"
+    },
+    
+    "deploySuccess": {
+      "title": "Deployment Successful!",
+      "subtitle": "{{name}} has been successfully deployed",
+      "invokeUrl": "Invoke URL",
+      "invokeUrlDesc": "Use this URL to invoke your function",
+      "copy": "Copy",
+      "copied": "Copied",
+      "viewDetail": "View Details",
+      "nextSteps": "Next Steps",
+      "nextStep1": "Send HTTP requests to the URL above to execute your function",
+      "nextStep2": "Check execution logs and metrics on the function detail page",
+      "nextStep3": "Modify function settings and redeploy as needed"
     }
   },
   
