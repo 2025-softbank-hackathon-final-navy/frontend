@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node'
 
-const BACKEND_URL = 'https://ec2-43-200-185-236.ap-northeast-2.compute.amazonaws.com:8080'
+const BACKEND_URL = 'http://ec2-43-200-185-236.ap-northeast-2.compute.amazonaws.com:8080'
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   // Set CORS headers for ALL requests (including OPTIONS)

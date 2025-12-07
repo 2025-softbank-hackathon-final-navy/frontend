@@ -24,7 +24,8 @@ apiClient.interceptors.request.use(
     // Local 환경에서 /api를 백엔드 URL로 변환 (다이렉트 HTTP)
     if (!import.meta.env.PROD && config.baseURL === '/api') {
       const backendUrl = import.meta.env.VITE_API_BASE_URL || 'http://ec2-43-200-185-236.ap-northeast-2.compute.amazonaws.com:8080'
-      config.baseURL = backendUrl
+      config.baseURL = backendUrl;
+      console.log('backendUrl', backendUrl);
     }
     
     // baseURL과 url 결합 시 중복 경로 제거
