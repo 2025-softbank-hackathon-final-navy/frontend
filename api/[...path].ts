@@ -12,7 +12,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate')
   res.setHeader('Pragma', 'no-cache')
   res.setHeader('Expires', '0')
-
+  console.log('req.method', req.method);
+  console.log('req.path', req.url);
   // Handle OPTIONS preflight request
   if (req.method === 'OPTIONS') {
     return res.status(200).end()
@@ -35,7 +36,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   })
   const queryString = searchParams.toString()
   const finalUrl = queryString ? `${targetUrl}?${queryString}` : targetUrl
-
+  console.log("finalUrl", finalUrl);
   try {
     // 원본 요청의 헤더를 그대로 전달 (필요한 헤더만 필터링)
     const forwardHeaders: Record<string, string> = {}
@@ -65,6 +66,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         ? (typeof req.body === 'string' ? req.body : JSON.stringify(req.body))
         : undefined,
     })
+    console.log("response", response.status);
 
     // Get response data
     const contentType = response.headers.get('content-type') || ''
