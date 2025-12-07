@@ -1,33 +1,20 @@
 /**
  * API 설정
  * 
- * 환경변수 VITE_API_BASE_URL로 baseURL을 설정할 수 있습니다.
- * 설정되지 않은 경우 기본값은 http://localhost:8080 입니다.
+ * 개발/프로덕션 모두 /api 사용 (프록시를 통해 백엔드로 연결)
  * 
- * baseURL은 사용자가 설정한 대로 사용됩니다.
- * 각 API 엔드포인트는 필요한 경로를 추가하여 호출합니다.
+ * - 개발 환경: Vite 프록시 (vite.config.ts)를 통해 /api/* → 백엔드
+ * - 프로덕션 환경: Vercel rewrites를 통해 /api/* → 백엔드
+ * 
+ * 이를 통해 Mixed Content 오류를 방지하고, 개발/프로덕션 환경의 일관성을 유지합니다.
+ * 
+ * 개발 환경의 프록시 백엔드 URL은 환경변수 VITE_API_BASE_URL로 설정 가능합니다.
+ * (기본값: http://localhost:8080)
  */
 
 const getBaseURL = (): string => {
-  const envURL = import.meta.env.VITE_API_BASE_URL
-  
-  if (!envURL) {
-    return 'http://localhost:8080'
-  }
-  
-  let url = envURL.trim()
-  
-  // 프로토콜 처리: 없으면 http:// 추가, https://면 http://로 변경
-  if (!url.match(/^https?:\/\//)) {
-    url = `http://${url}`
-  } else if (url.startsWith('https://')) {
-    url = url.replace('https://', 'http://')
-  }
-  
-  // 끝의 슬래시 제거
-  url = url.replace(/\/+$/, '')
-  
-  return url
+  // 모든 환경에서 상대 경로 /api 사용 (프록시를 통해 백엔드로 연결)
+  return '/api'
 }
 
 export const API_CONFIG = {
