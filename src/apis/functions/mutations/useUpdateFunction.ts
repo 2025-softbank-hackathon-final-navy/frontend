@@ -1,6 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import apiClient from '../../instance'
-import { API_CONFIG } from '../../../config/api'
 import {
   UpdateFunctionRequestSchema,
   UpdateFunctionResponseSchema,
@@ -77,7 +76,7 @@ export function useUpdateFunction() {
   return useMutation({
     mutationFn: updateFunction,
     retry: 0, // PUT 요청은 재시도하지 않음
-    onSuccess: (data, variables) => {
+    onSuccess: (_data, variables) => {
       // 함수 리스트 캐시 무효화
       queryClient.invalidateQueries({ queryKey: functionKeys.lists() })
       
