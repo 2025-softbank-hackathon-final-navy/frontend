@@ -25,22 +25,25 @@ export const RUNTIME_CONFIG: Record<Runtime, {
   icon: string
   packageFile: string
   packagePlaceholder: string
+  enabled?: boolean // 활성화 여부
 }> = {
-  'nodejs-18': { 
-    label: 'Node.js 18', 
-    extension: 'js', 
-    language: 'javascript', 
-    icon: 'fa-brands fa-node-js',
-    packageFile: 'package.json',
-    packagePlaceholder: 'express\naxios\nlodash'
-  },
   'python-3.11': { 
     label: 'Python 3.11', 
     extension: 'py', 
     language: 'python', 
     icon: 'fa-brands fa-python',
     packageFile: 'requirements.txt',
-    packagePlaceholder: 'requests==2.31.0\nnumpy>=1.24.0\npandas'
+    packagePlaceholder: 'requests==2.31.0\nnumpy>=1.24.0\npandas',
+    enabled: true
+  },
+  'nodejs-18': { 
+    label: 'Node.js 18', 
+    extension: 'js', 
+    language: 'javascript', 
+    icon: 'fa-brands fa-node-js',
+    packageFile: 'package.json',
+    packagePlaceholder: 'express\naxios\nlodash',
+    enabled: false
   },
   'go-1.22': { 
     label: 'Go 1.22', 
@@ -48,9 +51,13 @@ export const RUNTIME_CONFIG: Record<Runtime, {
     language: 'go', 
     icon: 'fa-brands fa-golang',
     packageFile: 'go.mod',
-    packagePlaceholder: 'github.com/gin-gonic/gin\ngithub.com/go-redis/redis/v8'
+    packagePlaceholder: 'github.com/gin-gonic/gin\ngithub.com/go-redis/redis/v8',
+    enabled: false
   },
 }
+
+// 런타임 순서 정의 (python, node, go 순서)
+export const RUNTIME_ORDER: Runtime[] = ['python-3.11', 'nodejs-18', 'go-1.22']
 
 // 기본 코드 템플릿
 export const DEFAULT_CODE: Record<Runtime, string> = {
@@ -72,26 +79,8 @@ export async function handler(event, context) {
     body: JSON.stringify(dish)
   };
 }`,
-  'python-3.11': `# 🍳 Chef's Special Recipe
-import json
-from datetime import datetime
-
-def handler(event, context):
-    ingredients = event.get("body", {})
-    
-    print("Preparing dish...")
-    
-    # Cooking Logic
-    dish = {
-        "name": "Serverless Pasta",
-        "status": "Delicious",
-        "cookedAt": datetime.now().isoformat()
-    }
-    
-    return {
-        "statusCode": 200,
-        "body": json.dumps(dish)
-    }`,
+  'python-3.11': `def handler(input_data):
+    return {"status": 200, "message": "Hello from Python"}`,
   'go-1.22': `// 🍳 Chef's Special Recipe
 package main
 
@@ -193,8 +182,8 @@ interface FunctionCreateState {
     name: string
     runtime: Runtime
     sourceCode: string
-    packages: string[]
     envVars: Record<string, string>
+    timeout: number
     description?: string
   }
 }
@@ -241,11 +230,18 @@ export const useFunctionCreateStore = create<FunctionCreateState>((set, get) => 
   setFunctionName: (name) => set({ functionName: name }),
   setDescription: (desc) => set({ description: desc }),
   
-  setRuntime: (runtime) => set({ 
-    runtime, 
-    code: DEFAULT_CODE[runtime],
-    packages: '', // 런타임 변경 시 패키지 초기화
-  }),
+  setRuntime: (runtime) => {
+    // Python만 활성화, 다른 런타임으로 변경 시도 시 무시
+    if (runtime !== 'python-3.11') {
+      console.warn('Only Python runtime is currently enabled')
+      return
+    }
+    set({ 
+      runtime, 
+      code: DEFAULT_CODE[runtime],
+      packages: '', // 런타임 변경 시 패키지 초기화
+    })
+  },
   
   setCode: (code) => set({ code }),
   setPackages: (packages) => set({ packages }),
@@ -296,17 +292,13 @@ export const useFunctionCreateStore = create<FunctionCreateState>((set, get) => 
       })
     
     // 패키지 문자열을 배열로 변환 (빈 줄 제거)
-    const packageList = state.packages
-      .split('\n')
-      .map(p => p.trim())
-      .filter(p => p.length > 0)
-    
+
     return {
       name: state.functionName,
       runtime: state.runtime,
       sourceCode: state.code,
-      packages: packageList,
       envVars,
+      timeout: state.timeout,
       ...(state.description && { description: state.description }),
     }
   },

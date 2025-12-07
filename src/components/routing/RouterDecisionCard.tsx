@@ -1,5 +1,6 @@
 import { RouterDecision } from '../../types/routing'
 import { getPoolColor, getPriorityColor } from '../../data/mockRoutingData'
+import { formatTimeKST } from '../../utils/date'
 
 interface RouterDecisionCardProps {
   decision: RouterDecision
@@ -13,7 +14,7 @@ export function RouterDecisionCard({ decision }: RouterDecisionCardProps) {
         <i className="fa-solid fa-route text-amber-400"></i>
         <h3 className="font-semibold">최신 라우팅 결정</h3>
         <span className="text-xs text-stone-400 ml-auto">
-          {new Date(decision.decidedAt).toLocaleTimeString('ko-KR')}
+          {formatTimeKST(decision.decidedAt)}
         </span>
       </div>
 
@@ -50,7 +51,7 @@ export function RouterDecisionCard({ decision }: RouterDecisionCardProps) {
           <div className="text-xs text-stone-400">Latency</div>
         </div>
         <div className="text-center">
-          <div className="text-2xl font-bold text-amber-400">{(decision.stats.errorRate * 100).toFixed(1)}%</div>
+          <div className="text-2xl font-bold text-amber-400">{decision.stats.errorRate.toFixed(1)}%</div>
           <div className="text-xs text-stone-400">Error</div>
         </div>
       </div>

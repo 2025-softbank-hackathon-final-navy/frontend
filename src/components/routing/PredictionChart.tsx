@@ -11,6 +11,7 @@ import {
   Filler,
 } from 'chart.js'
 import { PredictionPoint } from '../../types/routing'
+import { formatTimeKST } from '../../utils/date'
 
 ChartJS.register(
   CategoryScale,
@@ -31,8 +32,7 @@ export function PredictionChart({ data }: PredictionChartProps) {
   const nowIndex = data.findIndex(d => d.actualQps === null) - 1
   
   const labels = data.map(d => {
-    const date = new Date(d.timestamp)
-    return date.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })
+    return formatTimeKST(d.timestamp, { hour: '2-digit', minute: '2-digit' })
   })
 
   const chartData = {

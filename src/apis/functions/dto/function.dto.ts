@@ -11,12 +11,12 @@ import { z } from 'zod/v4'
 export const RuntimeSchema = z.enum(['nodejs-18', 'python-3.11', 'go-1.22'])
 export type Runtime = z.infer<typeof RuntimeSchema>
 
-/** 실행 모드 (warm: 웜 컨테이너, cold: 콜드 스타트) */
-export const ExecutionModeSchema = z.enum(['warm', 'cold'])
+/** 실행 모드 (warm: 웜 컨테이너, cold: 콜드 스타트, cold_fail: 콜드 스타트 실패) */
+export const ExecutionModeSchema = z.enum(['warm', 'cold', 'cold_fail'])
 export type ExecutionMode = z.infer<typeof ExecutionModeSchema>
 
 /** 실행 상태 */
-export const ExecutionStatusSchema = z.enum(['success', 'failed'])
+export const ExecutionStatusSchema = z.enum(['success', 'failed', 'error'])
 export type ExecutionStatus = z.infer<typeof ExecutionStatusSchema>
 
 /** 함수 상태 (HOT: 최근 실행됨, STABLE: 안정, COLD: 미사용) */
@@ -50,13 +50,14 @@ export type FunctionDetail = z.infer<typeof FunctionDetailSchema>
 
 // Function 생성/저장 API
 
-/** POST /api/functions - Request Body */
+/** POST /function - Request Body (내부 DTO, API 전송 시 snake_case로 변환) */
 export const CreateFunctionRequestSchema = z.object({
   name: z.string().min(1, '함수 이름은 필수입니다'),
   runtime: RuntimeSchema,
   sourceCode: z.string().min(1, '코드는 필수입니다'),
   envVars: z.record(z.string(), z.string()).optional().default({}),
   description: z.string().optional(),
+  timeout: z.number().optional(), // API 스펙에 있음
 })
 export type CreateFunctionRequest = z.infer<typeof CreateFunctionRequestSchema>
 
@@ -69,9 +70,22 @@ export const CreateFunctionResponseSchema = z.object({
     runtime: RuntimeSchema,
     description: z.string().optional(),
     updatedAt: z.string().datetime(),
+    invokeUrl: z.string().url().optional(), // 배포 후 받는 실제 Invoke URL
   }),
 })
 export type CreateFunctionResponse = z.infer<typeof CreateFunctionResponseSchema>
+
+// Function 수정 API
+
+/** PUT /function/{function_id} - Request Body (CreateFunctionRequest와 동일) */
+export const UpdateFunctionRequestSchema = CreateFunctionRequestSchema
+export type UpdateFunctionRequest = z.infer<typeof UpdateFunctionRequestSchema>
+
+/** PUT /function/{function_id} - Response */
+export const UpdateFunctionResponseSchema = z.object({
+  function_id: z.string().uuid(),
+})
+export type UpdateFunctionResponse = z.infer<typeof UpdateFunctionResponseSchema>
 
 // Function 조회 API
 
@@ -116,23 +130,63 @@ export type ExecuteFunctionResponse = z.infer<typeof ExecuteFunctionResponseSche
 
 // 실행 히스토리 API
 
-/** 실행 히스토리 아이템 */
+/** 실행 히스토리 아이템 (백엔드 응답 - snake_case) */
+export const ExecutionHistoryItemBackendSchema = z.object({
+  request_id: z.string(),
+  duration: z.number(),
+  execution_type: z.enum(['warm', 'cold', 'cold_fail']),
+  request_at: z.string(),
+  status: z.enum(['success', 'failed', 'error']),
+})
+export type ExecutionHistoryItemBackend = z.infer<typeof ExecutionHistoryItemBackendSchema>
+
+/** 실행 히스토리 아이템 (프론트엔드 - camelCase) */
 export const ExecutionHistoryItemSchema = z.object({
   requestId: z.string(),
-  mode: ExecutionModeSchema,
   duration: z.number(),
+  mode: ExecutionModeSchema,
+  requestAt: z.string(),
   status: ExecutionStatusSchema,
-  startedAt: z.string().datetime(),
-  finishedAt: z.string().datetime(),
 })
 export type ExecutionHistoryItem = z.infer<typeof ExecutionHistoryItemSchema>
 
-/** GET /api/functions/{functionId}/runs - Response */
-export const GetExecutionHistoryResponseSchema = z.object({
-  success: z.literal(true),
-  data: z.array(ExecutionHistoryItemSchema),
+/** GET /function/{function_id}/logs - Response (백엔드 형식) */
+export const GetExecutionHistoryResponseBackendSchema = z.object({
+  content: z.array(ExecutionHistoryItemBackendSchema),
+  pageable: z.object({
+    pageNumber: z.number(),
+    pageSize: z.number(),
+    sort: z.object({
+      unsorted: z.boolean(),
+      sorted: z.boolean(),
+      empty: z.boolean(),
+    }).optional(),
+    offset: z.number().optional(),
+    unpaged: z.boolean().optional(),
+    paged: z.boolean().optional(),
+  }).optional(),
+  totalPages: z.number(),
+  totalElements: z.number(),
+  last: z.boolean().optional(),
+  numberOfElements: z.number().optional(),
+  size: z.number().optional(),
+  number: z.number().optional(),
+  sort: z.object({
+    unsorted: z.boolean(),
+    sorted: z.boolean(),
+    empty: z.boolean(),
+  }).optional(),
+  first: z.boolean().optional(),
+  empty: z.boolean().optional(),
 })
-export type GetExecutionHistoryResponse = z.infer<typeof GetExecutionHistoryResponseSchema>
+export type GetExecutionHistoryResponseBackend = z.infer<typeof GetExecutionHistoryResponseBackendSchema>
+
+/** GET /function/{function_id}/logs - Response (프론트엔드용) */
+export interface GetExecutionHistoryResponse {
+  content: ExecutionHistoryItem[]
+  totalPages: number
+  totalElements: number
+}
 
 // 에러 응답 스키마
 

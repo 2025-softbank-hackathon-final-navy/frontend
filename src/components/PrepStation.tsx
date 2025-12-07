@@ -30,23 +30,8 @@ const DEFAULT_CODE: Record<Runtime, string> = {
 
   return res.json(dish);
 };`,
-  python: `# 🍳 Chef's Special Recipe
-import json
-from datetime import datetime
-
-def handler(req):
-    ingredients = req.get("body", {})
-    
-    print("Preparing dish...")
-    
-    # Cooking Logic
-    dish = {
-        "name": "Serverless Pasta",
-        "status": "Delicious",
-        "cookedAt": datetime.now().isoformat()
-    }
-    
-    return {"statusCode": 200, "body": dish}`,
+  python: `def handler(input_data):
+    return {"status": 200, "message": "Hello from Python"}`,
   go: `// 🍳 Chef's Special Recipe
 package main
 

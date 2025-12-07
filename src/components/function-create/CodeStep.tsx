@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import Editor from '@monaco-editor/react'
 import { useTranslation } from 'react-i18next'
-import { useFunctionCreateStore, RUNTIME_CONFIG, type Runtime } from '../../stores/functionCreateStore'
+import { useFunctionCreateStore, RUNTIME_CONFIG, RUNTIME_ORDER } from '../../stores/functionCreateStore'
 
 export function CodeStep() {
   const { t } = useTranslation()
@@ -225,19 +225,27 @@ export function CodeStep() {
         {/* Runtime selector in modal */}
         {isModal && (
           <div className="flex gap-1">
-            {(Object.entries(RUNTIME_CONFIG) as [Runtime, typeof RUNTIME_CONFIG[Runtime]][]).map(([key, cfg]) => (
-              <button
-                key={key}
-                onClick={() => setRuntime(key)}
-                className={`px-2 py-0.5 rounded text-xs font-medium transition-colors ${
-                  runtime === key 
-                    ? 'bg-amber-500 text-white' 
-                    : 'bg-stone-700 text-stone-400 hover:bg-stone-600'
-                }`}
-              >
-                {cfg.label}
-              </button>
-            ))}
+            {RUNTIME_ORDER.map((key) => {
+              const cfg = RUNTIME_CONFIG[key]
+              const isEnabled = cfg.enabled !== false
+              return (
+                <button
+                  key={key}
+                  onClick={() => isEnabled && setRuntime(key)}
+                  disabled={!isEnabled}
+                  className={`px-2 py-0.5 rounded text-xs font-medium transition-colors ${
+                    !isEnabled
+                      ? 'bg-stone-800 text-stone-500 cursor-not-allowed opacity-50'
+                      : runtime === key 
+                      ? 'bg-amber-500 text-white' 
+                      : 'bg-stone-700 text-stone-400 hover:bg-stone-600'
+                  }`}
+                  title={!isEnabled ? 'Coming soon' : undefined}
+                >
+                  {cfg.label}
+                </button>
+              )
+            })}
           </div>
         )}
         <div className="flex items-center gap-2 text-xs text-stone-500">
@@ -269,35 +277,57 @@ export function CodeStep() {
             {t('functionCreate.code.selectRuntime')} <span className="text-red-500">*</span>
           </label>
           <div className="grid grid-cols-3 gap-3">
-            {(Object.entries(RUNTIME_CONFIG) as [Runtime, typeof RUNTIME_CONFIG[Runtime]][]).map(([key, cfg]) => (
-              <button
-                key={key}
-                onClick={() => setRuntime(key)}
-                className={`
-                  relative p-4 rounded-xl border-2 transition-all duration-200 text-left
-                  ${runtime === key 
-                    ? 'border-amber-500 bg-amber-50 shadow-lg shadow-amber-500/10' 
-                    : 'border-stone-200 bg-white hover:border-stone-300 hover:shadow-md'
-                  }
-                `}
-              >
-                {runtime === key && (
-                  <div className="absolute top-2 right-2">
-                    <span className="flex items-center justify-center w-5 h-5 bg-amber-500 rounded-full">
-                      <i className="fa-solid fa-check text-white text-xs"></i>
-                    </span>
+            {RUNTIME_ORDER.map((key) => {
+              const cfg = RUNTIME_CONFIG[key]
+              const isEnabled = cfg.enabled !== false
+              return (
+                <button
+                  key={key}
+                  onClick={() => isEnabled && setRuntime(key)}
+                  disabled={!isEnabled}
+                  className={`
+                    relative p-4 rounded-xl border-2 transition-all duration-200 text-left
+                    ${!isEnabled
+                      ? 'border-stone-100 bg-stone-50 opacity-50 cursor-not-allowed'
+                      : runtime === key 
+                      ? 'border-amber-500 bg-amber-50 shadow-lg shadow-amber-500/10' 
+                      : 'border-stone-200 bg-white hover:border-stone-300 hover:shadow-md'
+                    }
+                  `}
+                  title={!isEnabled ? 'Coming soon' : undefined}
+                >
+                  {runtime === key && isEnabled && (
+                    <div className="absolute top-2 right-2">
+                      <span className="flex items-center justify-center w-5 h-5 bg-amber-500 rounded-full">
+                        <i className="fa-solid fa-check text-white text-xs"></i>
+                      </span>
+                    </div>
+                  )}
+                  
+                  {!isEnabled && (
+                    <div className="absolute top-2 right-2">
+                      <span className="flex items-center justify-center w-5 h-5 bg-stone-300 rounded-full">
+                        <i className="fa-solid fa-lock text-stone-600 text-xs"></i>
+                      </span>
+                    </div>
+                  )}
+                  
+                  <div className={`text-xl mb-1 ${!isEnabled ? 'text-stone-300' : runtime === key ? 'text-amber-600' : 'text-stone-400'}`}>
+                    <i className={cfg.icon}></i>
                   </div>
-                )}
-                
-                <div className={`text-xl mb-1 ${runtime === key ? 'text-amber-600' : 'text-stone-400'}`}>
-                  <i className={cfg.icon}></i>
-                </div>
-                
-                <div className={`font-semibold text-sm ${runtime === key ? 'text-amber-700' : 'text-stone-700'}`}>
-                  {cfg.label}
-                </div>
-              </button>
-            ))}
+                  
+                  <div className={`font-semibold text-sm ${!isEnabled ? 'text-stone-400' : runtime === key ? 'text-amber-700' : 'text-stone-700'}`}>
+                    {cfg.label}
+                  </div>
+                  
+                  {!isEnabled && (
+                    <div className="text-xs text-stone-400 mt-1">
+                      Coming soon
+                    </div>
+                  )}
+                </button>
+              )
+            })}
           </div>
         </div>
         

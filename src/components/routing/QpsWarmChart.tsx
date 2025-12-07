@@ -11,6 +11,7 @@ import {
   Filler,
 } from 'chart.js'
 import { TimeSeriesPoint } from '../../types/routing'
+import { formatTimeKST } from '../../utils/date'
 
 ChartJS.register(
   CategoryScale,
@@ -29,7 +30,7 @@ interface QpsWarmChartProps {
 
 export function QpsWarmChart({ data }: QpsWarmChartProps) {
   const labels = data.map(d => 
-    new Date(d.timestamp).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })
+    formatTimeKST(d.timestamp, { hour: '2-digit', minute: '2-digit' })
   )
 
   const chartData = {
@@ -135,9 +136,6 @@ export function QpsWarmChart({ data }: QpsWarmChartProps) {
       <div className="h-64">
         <Line data={chartData} options={options} />
       </div>
-      <p className="mt-3 text-xs text-stone-500 text-center">
-        💡 QPS가 올라갈 때 desiredWarm(보라 점선)이 미리 따라 올라가는 패턴을 확인하세요
-      </p>
     </div>
   )
 }
