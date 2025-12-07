@@ -1,19 +1,16 @@
 /**
  * API 설정
  * 
- * 개발/프로덕션 모두 /api 사용 (프록시를 통해 백엔드로 연결)
+ * - Local 환경: 다이렉트 HTTP (프록시 없이 직접 백엔드로 연결)
+ * - Vercel 환경: HTTPS 프록시 (/api를 통해 백엔드로 연결)
  * 
- * - 개발 환경: Vite 프록시 (vite.config.ts)를 통해 /api/* → 백엔드
- * - 프로덕션 환경: Vercel rewrites를 통해 /api/* → 백엔드
- * 
- * 이를 통해 Mixed Content 오류를 방지하고, 개발/프로덕션 환경의 일관성을 유지합니다.
- * 
- * 개발 환경의 프록시 백엔드 URL은 환경변수 VITE_API_BASE_URL로 설정 가능합니다.
- * (기본값: http://localhost:8080)
+ * Local 환경의 백엔드 URL은 환경변수 VITE_API_BASE_URL로 설정 가능합니다.
  */
 
 const getBaseURL = (): string => {
-  // 모든 환경에서 상대 경로 /api 사용 (프록시를 통해 백엔드로 연결)
+  // 모든 환경에서 /api 사용
+  // - Local: 다이렉트 HTTP (프록시 없이 직접 백엔드로 연결)
+  // - Vercel: HTTPS 프록시 (/api를 통해 백엔드로 연결)
   return '/api'
 }
 

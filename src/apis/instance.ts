@@ -5,7 +5,8 @@ import { API_CONFIG } from '../config/api'
  * Axios 공통 인스턴스
  * 
  * Base URL은 src/config/api.ts에서 관리됩니다.
- * 환경변수 VITE_API_BASE_URL로 설정 가능합니다.
+ * - Local: /api를 백엔드 URL로 변환 (다이렉트 HTTP)
+ * - Vercel: /api 프록시 사용 (HTTPS)
  */
 export const apiClient = axios.create({
   baseURL: API_CONFIG.baseURL,
@@ -20,6 +21,12 @@ export const apiClient = axios.create({
 // Request Interceptor
 apiClient.interceptors.request.use(
   (config) => {
+    // Local 환경에서 /api를 백엔드 URL로 변환 (다이렉트 HTTP)
+    if (!import.meta.env.PROD && config.baseURL === '/api') {
+      const backendUrl = import.meta.env.VITE_API_BASE_URL || 'http://ec2-43-200-185-236.ap-northeast-2.compute.amazonaws.com:8080'
+      config.baseURL = backendUrl
+    }
+    
     // baseURL과 url 결합 시 중복 경로 제거
     if (config.baseURL && config.url) {
       try {

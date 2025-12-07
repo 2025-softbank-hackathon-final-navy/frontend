@@ -13,14 +13,7 @@ export default defineConfig({
   server: {
     port: 3000,
     open: true,
-    proxy: {
-      '/api': {
-        target: process.env.VITE_API_BASE_URL || 'http://localhost:8080',
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, ''),
-        secure: false,
-      },
-    },
+    // Local 환경에서는 프록시 없이 다이렉트 HTTP 사용
   },
   build: {
     outDir: 'dist',
