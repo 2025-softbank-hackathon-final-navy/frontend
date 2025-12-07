@@ -8,6 +8,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Accept, Authorization')
 
+  // Prevent caching to avoid 304 responses
+  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate')
+  res.setHeader('Pragma', 'no-cache')
+  res.setHeader('Expires', '0')
+
   // Handle OPTIONS preflight request
   if (req.method === 'OPTIONS') {
     return res.status(200).end()
@@ -89,12 +94,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       data = await response.text()
     }
 
-    // Set CORS headers
-    res.setHeader('Access-Control-Allow-Origin', '*')
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS')
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Accept')
-
-    // Return response
+    // Return response (CORS headers already set at the top)
     return res.status(response.status).json(data)
   } catch (error) {
     console.error('Proxy error:', error)
