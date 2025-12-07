@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { RouterDecisionLog } from '../../types/routing'
 import { getPoolColor, getPriorityColor } from '../../data/mockRoutingData'
+import { formatTimeKST } from '../../utils/date'
 
 interface RoutingHistoryTableProps {
   logs: RouterDecisionLog[]
@@ -65,7 +66,7 @@ export function RoutingHistoryTable({ logs }: RoutingHistoryTableProps) {
             {filteredLogs.map((log) => (
               <tr key={log.id} className="hover:bg-stone-50 transition-colors">
                 <td className="px-4 py-3 text-sm text-stone-600">
-                  {new Date(log.decidedAt).toLocaleTimeString('ko-KR', { 
+                  {formatTimeKST(log.decidedAt, { 
                     hour: '2-digit', 
                     minute: '2-digit',
                     second: '2-digit'

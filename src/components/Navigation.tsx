@@ -10,7 +10,6 @@ export function Navigation() {
   const navItems = [
     { path: '/', label: t('nav.home'), icon: 'fa-home' },
     { path: '/functions', label: t('nav.functions'), icon: 'fa-layer-group' },
-    { path: '/nodes', label: 'Nodes', icon: 'fa-server' },
     { path: '/ai-helper', label: t('nav.aiSousChef'), icon: 'fa-robot' },
     { path: '/architecture', label: t('nav.architecture'), icon: 'fa-sitemap' },
   ]
@@ -52,13 +51,13 @@ export function Navigation() {
           {/* Mobile: Language Switcher + Hamburger */}
           <div className="lg:hidden flex items-center gap-2">
             <LanguageSwitcher />
-            <button 
+          <button 
               className="text-stone-600 p-2 hover:bg-stone-100 rounded-lg transition-colors"
-              onClick={toggleMenu}
-              aria-label="Toggle menu"
-            >
-              <i className={`fa-solid ${isMenuOpen ? 'fa-xmark' : 'fa-bars'} text-xl`}></i>
-            </button>
+            onClick={toggleMenu}
+            aria-label="Toggle menu"
+          >
+            <i className={`fa-solid ${isMenuOpen ? 'fa-xmark' : 'fa-bars'} text-xl`}></i>
+          </button>
           </div>
         </div>
       </div>

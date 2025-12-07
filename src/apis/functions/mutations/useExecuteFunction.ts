@@ -10,14 +10,13 @@ import { functionKeys } from '../queries/useFunction'
 /**
  * 함수 실행 Mutation
  * 
- * POST /api/functions/{functionId}/execute
+ * POST /function/invoke
  * 
- * DATA_STREAM.md 흐름:
- * 1. Router가 requestId 생성
- * 2. Redis Queue에 실행 요청 적재
- * 3. Worker가 함수 실행 (cold/warm)
- * 4. 결과 Pub/Sub으로 전달
- * 5. HTTP 응답 반환
+ * 실제 백엔드 API 스펙:
+ * - 엔드포인트: POST /function/invoke
+ * - 요청 Body: { function_id: string, args?: Record<string, unknown> }
+ * - 응답: { status, executionType, duration, logs, result }
+ * 
  */
 
 interface ExecuteFunctionParams {
@@ -33,14 +32,40 @@ async function executeFunction({
   // 요청 데이터 검증
   const validatedRequest = ExecuteFunctionRequestSchema.parse({ args })
   
-  const response = await apiClient.post(
-    `/api/functions/${functionId}/execute`,
-    validatedRequest
-  )
+  // 백엔드 API 형식으로 변환
+  const apiRequest = {
+    function_id: functionId,
+    args: validatedRequest.args || {},
+  }
   
-  // 응답 검증
-  const parsed = ExecuteFunctionResponseSchema.parse(response.data)
-  return parsed.data
+  const response = await apiClient.post('/function/invoke', apiRequest)
+  
+  // 백엔드 응답 형식 변환
+  // 백엔드: { status, executionType, duration, logs, result }
+  // DTO: { requestId, functionId, mode, duration, status, logs, result, ... }
+  const backendResponse = response.data
+  
+  // 응답이 이미 DTO 형식인 경우
+  if (backendResponse.functionId && backendResponse.mode) {
+    const parsed = ExecuteFunctionResponseSchema.parse(response.data)
+    return parsed.data
+  }
+  
+  // 백엔드 형식으로 응답하는 경우 변환
+  if (backendResponse.status && backendResponse.executionType) {
+    return {
+      requestId: `req-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      functionId,
+      mode: backendResponse.executionType === 'warm' ? 'warm' : 'cold',
+      duration: Math.round((backendResponse.duration || 0) * 1000), // 초 → 밀리초
+      status: backendResponse.status === 'success' ? 'success' : 'failed',
+      logs: backendResponse.logs || '',
+      result: backendResponse.result || '',
+    }
+  }
+  
+  // 예상치 못한 응답 형식
+  throw new Error('Unexpected API response format')
 }
 
 // React Query Hook

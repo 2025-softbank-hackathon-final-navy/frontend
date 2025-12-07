@@ -1,8 +1,10 @@
+import { useState, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useFunctionCreateStore, RUNTIME_CONFIG } from '../../stores/functionCreateStore'
-// import { useCreateFunction } from '../../apis' // TODO: 실제 API 연동 시 활성화
+import { useCreateFunction } from '../../apis'
 import { ConsoleOutput } from './ConsoleOutput'
+import { DeploySuccessModal } from './DeploySuccessModal'
 
 export function ReviewStep() {
   const navigate = useNavigate()
@@ -28,7 +30,15 @@ export function ReviewStep() {
     reset,
   } = useFunctionCreateStore()
 
-  // const createFunction = useCreateFunction() // TODO: 실제 API 연동 시 활성화
+  const createFunction = useCreateFunction()
+  const [deployResult, setDeployResult] = useState<{
+    functionId: string
+    functionName: string
+    invokeUrl: string
+  } | null>(null)
+  
+  // 중복 호출 방지
+  const isDeployingRef = useRef(false)
   
   const validEnvVars = envVariables.filter(e => e.key.trim())
   const secretCount = validEnvVars.filter(e => e.isSecret).length
@@ -36,6 +46,13 @@ export function ReviewStep() {
   const config = RUNTIME_CONFIG[runtime]
   
   const handleDeploy = async () => {
+    // 중복 호출 방지
+    if (isDeployingRef.current || isDeploying) {
+      console.warn('[Deploy] Already deploying, ignoring duplicate call')
+      return
+    }
+    
+    isDeployingRef.current = true
     setDeploying(true)
     clearConsole()
     setShowConsole(true)
@@ -78,37 +95,60 @@ export function ReviewStep() {
         ])
         
         try {
-          // 실제 API 호출 (현재는 Mock)
-          // const result = await createFunction.mutateAsync(request)
+          // 실제 API 호출
+          const result = await createFunction.mutateAsync(request)
           
-          // Mock 성공 응답
-          setTimeout(() => {
-            addConsoleOutput([
-              '',
-              `[${timeStr()}] ✅ Deployment successful!`,
-              '',
-              '─── Deployment Info ───',
-              `Function: ${request.name}`,
-              ...(request.description ? [`Description: ${request.description}`] : []),
-              `Runtime: ${config.label}`,
-              `Memory: ${memory}MB`,
-              `Timeout: ${timeout}s`,
-              `URL: https://api.codebistro.dev/fn/${request.name}`,
-              `Version: v${Date.now().toString().slice(-6)}`,
-              '',
-              '🎉 Your function is now live!',
-            ])
-            
-            setDeploying(false)
-          }, 1000)
+          // Invoke URL 생성 (API에서 제공하지 않으면 기본 형식 사용)
+          const invokeUrl = result.invokeUrl || `https://api.codebistro.dev/fn/${result.functionId}`
           
-        } catch (error) {
+          addConsoleOutput([
+            '',
+            `[${timeStr()}] ✅ Deployment successful!`,
+            '',
+            '─── Deployment Info ───',
+            `Function: ${result.name}`,
+            ...(result.description ? [`Description: ${result.description}`] : []),
+            `Runtime: ${config.label}`,
+            `Memory: ${memory}MB`,
+            `Timeout: ${timeout}s`,
+            `URL: ${invokeUrl}`,
+            `Function ID: ${result.functionId}`,
+            '',
+            '🎉 Your function is now live!',
+          ])
+          
+          // 배포 성공 모달 표시
+          setDeployResult({
+            functionId: result.functionId,
+            functionName: result.name,
+            invokeUrl,
+          })
+          
+          setDeploying(false)
+          isDeployingRef.current = false
+          
+        } catch (error: unknown) {
+          let errorMessage = 'Unknown error'
+          
+          if (error instanceof Error) {
+            errorMessage = error.message
+          } else if (typeof error === 'object' && error !== null) {
+            // Axios error response
+            const axiosError = error as { response?: { data?: { error?: { message?: string } } } }
+            if (axiosError.response?.data?.error?.message) {
+              errorMessage = axiosError.response.data.error.message
+            }
+          }
+          
           addConsoleOutput([
             '',
             `[${timeStr()}] ❌ Deployment failed!`,
-            `Error: ${error instanceof Error ? error.message : 'Unknown error'}`,
+            `Error: ${errorMessage}`,
+            '',
+            'Please check your function configuration and try again.',
           ])
           setDeploying(false)
+          isDeployingRef.current = false
         }
       }, 1500)
       
@@ -117,12 +157,18 @@ export function ReviewStep() {
         `[${timeStr()}] ❌ Error: ${error instanceof Error ? error.message : 'Unknown error'}`,
       ])
       setDeploying(false)
+      isDeployingRef.current = false
     }
   }
 
   const handleFinish = () => {
     reset()
+    setDeployResult(null)
     navigate('/functions')
+  }
+
+  const handleCloseModal = () => {
+    setDeployResult(null)
   }
   
   return (
@@ -241,19 +287,6 @@ export function ReviewStep() {
           )}
         </div>
         
-        {/* Invoke URL Preview */}
-        <div className="bg-white rounded-xl border border-stone-200 p-5">
-          <h4 className="font-semibold text-stone-700 mb-4 flex items-center gap-2">
-            <i className="fa-solid fa-link text-purple-500"></i>
-            {t('functionCreate.review.invokeUrl')}
-          </h4>
-          <div className="bg-stone-50 rounded-lg p-3 font-mono text-sm break-all text-stone-600">
-            https://api.codebistro.dev/fn/{functionName}
-          </div>
-          <p className="text-xs text-stone-400 mt-2">
-            {t('functionCreate.review.invokeUrlDesc')}
-          </p>
-        </div>
       </div>
       
       {/* Console Output */}
@@ -263,6 +296,16 @@ export function ReviewStep() {
           isRunning={isDeploying}
           onClose={() => setShowConsole(false)}
           onClear={clearConsole}
+        />
+      )}
+
+      {/* Deploy Success Modal */}
+      {deployResult && (
+        <DeploySuccessModal
+          functionId={deployResult.functionId}
+          functionName={deployResult.functionName}
+          invokeUrl={deployResult.invokeUrl}
+          onClose={handleCloseModal}
         />
       )}
       
